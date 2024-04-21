@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import '../src/styles/variables.css'
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import {
@@ -12,7 +13,12 @@ import UserDetails from './routes/UserDetails';
 import NotFound from './routes/NotFound';
 import Home from './routes/Home'
 import Departments from './routes/Departments';
+import Dashboard from './routes/Dashboard';
 const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Dashboard />,
+  },
   {
     path: "/users",
     element: <Users />,
