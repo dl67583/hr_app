@@ -8,7 +8,7 @@
 /* Body styles */
 body {
     font-family: Arial, sans-serif;
-    background-color: #0f0f0f;
+    background-color: lightgray;
     color: #ffffff;
     line-height: 1.6;
 }
@@ -56,7 +56,9 @@ p {
     padding: 50px;
     text-align: center;
 }
-
+/* .space {
+    height: 40vh;
+} */
 /* Footer styles */
 footer {
     background-color: #000000;

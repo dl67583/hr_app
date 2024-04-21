@@ -32,10 +32,8 @@
 }
 
 .navbar-container{
-    display: flex;
-    justify-content: space-between;
     height: 64px;
-    align-items: center;
+    /* align-items: center; */
 }
 
 .menu-items{
