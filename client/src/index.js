@@ -1,42 +1,37 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
-import Users from './routes/Users';
-import UserDetails from './routes/UserDetails';
-import NotFound from './routes/NotFound';
-import Home from './routes/Home'
-import Departments from './routes/Departments';
-const router = createBrowserRouter([
-  {
-    path: "/users",
-    element: <Users />,
-  },
-  {
-    path: "/departments",
-    element: <Departments />,
-  },
-  // {
-  //   path: "/users:id",
-  //   element: <UserDetails />,
-  // },
-  // {
-  //   path: "/",
-  //   element: <Home />,
-  //   errorElement:<NotFound/>
-  // },
-]);
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import "./styles/Navbar.css"
+import "./styles/Footer.css"
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+// const router = createBrowserRouter([
+//   {
+//     path: "/users",
+//     element: <Users />,
+//   },
+//   {
+//     path: "/departments",
+//     element: <Departments />,
+//   },
+//   // {
+//   //   path: "/users:id",
+//   //   element: <UserDetails />,
+//   // },
+//   // {
+//   //   path: "/",
+//   //   element: <Home />,
+//   //   errorElement:<NotFound/>
+//   // },
+// ]);
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-        <RouterProvider router={router} />
-
+    <>
+     <App/>
+    </>
   </React.StrictMode>
 );
 
