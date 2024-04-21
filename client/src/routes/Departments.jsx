@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import '../styles/crud.css';
 
 
 const Departments = () => {
   const [departments, setDepartments] = useState([]);
   const [users, setUsers] = useState([]);
   const [editDepartment, setEditDepartment] = useState(null);
+  const [createDepartment, setCreateDepartment] = useState(null);
   const [createFormData, setCreateFormData] = useState({
     name: "",
-    headOfDepartmentId:""
- 
+    headOfDepartmentId: ""
+
   });
   const [editFormData, setEditFormData] = useState({
     name: "",
-    headOfDepartmentId:""
+    headOfDepartmentId: ""
 
   });
 
@@ -61,9 +63,8 @@ const Departments = () => {
       await axios.post("http://localhost:3001/api/departments", createFormData);
       setCreateFormData({
         name: e.target.name.value,
-    
-
       });
+      closeCreatePopup();
       fetchDepartments();
     } catch (error) {
       console.error("Error creating department:", error);
@@ -84,93 +85,127 @@ const Departments = () => {
         `http://localhost:3001/api/departments/${editDepartment.id}`,
         editFormData
       );
-      closePopup(); 
-      fetchDepartments(); 
+      closePopup();
+      fetchDepartments();
     } catch (error) {
       console.error("Error updating department:", error);
     }
   };
 
+  const openCreatePopup = (department) => {
+    setCreateDepartment(department);
+    setCreateFormData({ ...department });
+  };
+
   const openPopup = (department) => {
-    setEditDepartment(department); 
-    setEditFormData({ ...department }); 
+    setEditDepartment(department);
+    setEditFormData({ ...department });
   };
 
   const closePopup = () => {
-    setEditDepartment(null); 
+    setEditDepartment(null);
   };
+  
+  const closeCreatePopup = () => {
+    setCreateDepartment(null);
+  };
+
   return (
     <div>
-      <h1>Departments</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          value={createFormData.name}
-          onChange={handleChange}
-        />
-         <select name="headOfDepartmentId" id="headOfDepartmentId" 
-                 onChange={handleChange}
-                 value={createFormData.headOfDepartmentId}>
-          <option value="" disabled selected>Head of Department</option>
-          {users.map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.name} - {item.surname}
-              {
+      <div className="container">
+        <table className="table table-bordered users-tbl">
+          <tbody>
+            <tr className="table-dark">
+              <th>Department</th>
+              <th>Head of Department</th>
+              <th colSpan={2} className="justify-content-end text-end"><button onClick={() => openCreatePopup(departments)} className="btn btn-sm btn-success">Add Department</button></th>
+            </tr>
+            {departments.map((department) => (
+              <>
+                <tr key={department.id} className="table-light">
+                  <td>{department.name}</td>
+                  <td>{department.headOfDepartmentId && users.find(user => user.id === department.headOfDepartmentId)?.name}</td>
+                  <td><button onClick={() => openPopup(department)} className="btn btn-sm btn-primary">Update</button></td>
+                  <td><button onClick={() => deleteDepartment(department.id)} className="btn btn-sm btn-danger">Delete</button></td>
+                </tr>
+              </>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {createDepartment && (
+        <div className="popup-bg">
+          <div className="popup">
+            <div className="popup-inner">
+              <h2>Add department</h2>
+              <form onSubmit={handleSubmit}>
+                <div className="row">
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Name"
+                    value={createFormData.name}
+                    onChange={handleChange}
+                  />
 
+                  <select
+                    name="headOfDepartmentId"
+                    id="headOfDepartmentId"
+                    onChange={handleChange}
+                    value={createFormData.headOfDepartmentId}
+                  >
+                    <option value="">headOfDepartment</option>
+                    {users.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.name} {item.surname}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              }
-            </option>
-            
-          ))}
-        </select>
-
-
-        <button type="submit">Add Department</button>
-      </form>
-      <ul>
-        {departments.map((department) => (
-          <li key={department.id}>
-            {department.name} - {department.headOfDepartmentId && users.find(user => user.id === department.headOfDepartmentId)?.name}
-            <button onClick={() => deleteDepartment(department.id)}>Delete</button>
-            <button onClick={() => openPopup(department)}>Update</button>
-
-          </li>
-        ))}
-      </ul>
+                <div className="row">
+                  <button type="submit" className="btn btn-primary col-4">Save</button>
+                  <button onClick={closeCreatePopup} className="btn btn-danger col-4">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
       {editDepartment && (
-        <div className="popup">
-          <div className="popup-inner">
-            <h2>Edit department</h2>
-            <form onSubmit={handleUpdateDepartment}>
-           
-              <input
-                type="text"
-                name="name"
-                placeholder="Name"
-                value={editFormData.name}
-                onChange={handleEditChange}
-              />
-              
-              <select
-                name="headOfDepartmentId"
-                id="headOfDepartmentId"
-                onChange={handleEditChange}
-                value={editFormData.headOfDepartmentId}
-              >
-                <option value="">headOfDepartment</option>
-                {users.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.name} - {item.surname}
-         
-                  </option>
-                ))}
-              </select>
-    
-              <button type="submit">Save</button>
-              <button onClick={closePopup}>Cancel</button>
-            </form>
+        <div className="popup-bg">
+          <div className="popup">
+            <div className="popup-inner">
+              <h2>Edit department</h2>
+              <form onSubmit={handleUpdateDepartment}>
+
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Name"
+                  value={editFormData.name}
+                  onChange={handleEditChange}
+                />
+
+                <select
+                  name="headOfDepartmentId"
+                  id="headOfDepartmentId"
+                  onChange={handleEditChange}
+                  value={editFormData.headOfDepartmentId}
+                >
+                  <option value="">headOfDepartment</option>
+                  {users.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name} - {item.surname}
+
+                    </option>
+                  ))}
+                </select>
+
+                <button type="submit">Save</button>
+                <button onClick={closePopup}>Cancel</button>
+              </form>
+            </div>
           </div>
         </div>
       )}

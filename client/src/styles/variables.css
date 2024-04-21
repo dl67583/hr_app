@@ -1,0 +1,6 @@
+:root{
+    --main-dark: 6, 80, 80;
+    --main-light: 255,255,255;
+}
+
+/* when referencing you write rgba(var(--your-var-here),1) */

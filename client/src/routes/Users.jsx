@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import {useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
+import '../styles/crud.css';
+
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
-  const [editUser, setEditUser] = useState(null); 
+  const [editUser, setEditUser] = useState(null);
+  const [createUsers, setCreateUsers] = useState(null)
   const navigate = useNavigate()
 
   const [createFormData, setCreateFormData] = useState({
@@ -19,7 +22,7 @@ const Users = () => {
     role: "",
 
     departmentId: "",
- 
+
   });
   const [editFormData, setEditFormData] = useState({
     name: "",
@@ -88,6 +91,7 @@ const Users = () => {
         departmentId: e.target.departmentId.value,
       });
       console.log(createFormData);
+      closeCreatePopup();
       fetchUsers();
       navigate('/users');
 
@@ -113,203 +117,271 @@ const Users = () => {
         `http://localhost:3001/api/users/${editUser.id}`,
         editFormData
       );
-      closePopup(); 
-      fetchUsers(); 
+      closePopup();
+      fetchUsers();
       navigate('/users');
     } catch (error) {
       console.error("Error updating user:", error);
     }
   };
 
+  const openCreatePopup = (user) => {
+    setCreateUsers(user);
+    setCreateFormData({ ...user });
+  };
+
   const openPopup = (user) => {
-    setEditUser(user); 
-    setEditFormData({ ...user }); 
+    setEditUser(user);
+    setEditFormData({ ...user });
   };
 
   const closePopup = () => {
-    setEditUser(null); 
+    setEditUser(null);
   };
+  const closeCreatePopup = () => {
+    setCreateUsers(null)
+  }
 
   return (
     <div>
-      <h1>Users</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          value={createFormData.name}
-          onChange={handleChange}
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={createFormData.email}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="surname"
-          placeholder="surname"
-          value={createFormData.surname}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="username"
-          placeholder="username"
-          value={createFormData.username}
-          onChange={handleChange}
-        />
-        <input
-          type="phone"
-          name="phone"
-          placeholder="phone"
-          value={createFormData.phone}
-          onChange={handleChange}
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="password"
-          value={createFormData.password}
-          onChange={handleChange}
-        />
-        <input
-          type="date"
-          name="birthday"
-          placeholder="01/01/2001"
-          value={createFormData.birthday}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="position"
-          placeholder="position"
-          value={createFormData.position}
-          onChange={handleChange}
-        />
-        <input
-          type="role"
-          name="role"
-          placeholder="role"
-          value={editFormData.role}
-          onChange={handleChange}
-        />
-        <select
-          name="departmentId"
-          id="departmentId"
-          onChange={handleChange}
-          value={createFormData.departmentId}
-        >
-          <option value="">departmentId</option>
-          {departments.map((item) => (
-            <option key={item.id} value={item.id}>
-              {item.name}
-            </option>
-          ))}
-        </select>
-        <button type="submit">Add User</button>
-      </form>
-      <ul>
-        {users.map((user) => (
-          <li key={user.id}>
-            {user.name} - {user.email} - 
-           {user.departmentId && departments.find(department => department.id === user.departmentId)?.name}
+      <h1></h1>
 
-            <button onClick={() => openPopup(user)}>Update</button>
-            <button onClick={() => deleteUser(user.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
 
+      <div className="container">
+        <table className="table table-bordered users-tbl">
+          <tbody>
+            <tr className="table-dark">
+              <th>Name</th>
+              <th>Surame</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Department</th>
+              <th>Position</th>
+              <th>Role</th>
+              <th colSpan={2} className="justify-content-end text-end"><button onClick={() => openCreatePopup(users)} className="btn btn-sm btn-success">Add User</button></th>
+            </tr>
+            {users.map((user) => (
+              <>
+                <tr key={user.id} className="table-light">
+                  <td>{user.name}</td>
+                  <td>{user.surname}</td>
+                  <td>{user.username}</td>
+                  <td>{user.email}</td>
+                  <td>{user.phone}</td>
+                  <td>{user.departmentId && departments.find(department => department.id === user.departmentId)?.name}</td>
+                  <td>{user.position}</td>
+                  <td>{user.role}</td>
+                  <td><button onClick={() => openPopup(user)} className="btn btn-sm btn-primary">Update</button></td>
+                  <td><button onClick={() => deleteUser(user.id)} className="btn btn-sm btn-danger">Delete</button></td>
+                </tr>
+              </>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {createUsers && (
+
+        <div className="popup-bg">
+          <div className="popup">
+            <h2>Create User</h2>
+            <div className="popup-inner d-flex justify-content-center align-items-center">
+              <form onSubmit={handleSubmit}>
+                <div className="row">
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Name"
+                    value={createFormData.name}
+                    onChange={handleChange}
+                  />
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+                    value={createFormData.email}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="row">
+                  <input
+                    type="text"
+                    name="surname"
+                    placeholder="surname"
+                    value={createFormData.surname}
+                    onChange={handleChange}
+                  />
+                  <input
+                    type="text"
+                    name="username"
+                    placeholder="username"
+                    value={createFormData.username}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="row">
+                  <input
+                    type="phone"
+                    name="phone"
+                    placeholder="phone"
+                    value={createFormData.phone}
+                    onChange={handleChange}
+                  />
+                  <input
+                    type="password"
+                    name="password"
+                    placeholder="password"
+                    value={createFormData.password}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="row">
+                  <input
+                    type="date"
+                    name="birthday"
+                    placeholder="01/01/2001"
+                    value={createFormData.birthday}
+                    onChange={handleChange}
+                  />
+                  <input
+                    type="text"
+                    name="position"
+                    placeholder="position"
+                    value={createFormData.position}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="row">
+                  <input
+                    type="text"
+                    name="role"
+                    placeholder="role"
+                    value={createFormData.role}
+                    onChange={handleChange}
+                  />
+                  <select
+                    name="departmentId"
+                    id="departmentId"
+                    onChange={handleChange}
+                    value={createFormData.departmentId}
+                  >
+                    <option value="">departmentId</option>
+                    {departments.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="row">
+                  <button type="submit" className="btn btn-primary col-4">Save</button>
+                  <button onClick={closeCreatePopup} className="btn btn-danger col-4">Cancel</button>
+                </div>
+
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
       {editUser && (
-        <div className="popup">
-          <div className="popup-inner">
+        <div className="popup-bg">
+          <div className="popup">
             <h2>Edit User</h2>
-            <form onSubmit={handleUpdateUser}>
-           
-              <input
-                type="text"
-                name="name"
-                placeholder="Name"
-                value={editFormData.name}
-                onChange={handleEditChange}
-              />
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={editFormData.email}
-                onChange={handleEditChange}
-              />
-              <input
-                type="text"
-                name="surname"
-                placeholder="surname"
-                value={editFormData.surname}
-                onChange={handleEditChange}
-              />
-              <input
-                type="text"
-                name="username"
-                placeholder="username"
-                value={editFormData.username}
-                onChange={handleEditChange}
-              />
-              <input
-                type="phone"
-                name="phone"
-                placeholder="phone"
-                value={editFormData.phone}
-                onChange={handleEditChange}
-              />
-              <input
-                type="password"
-                name="password"
-                placeholder="password"
-                value={editFormData.password}
-                onChange={handleEditChange}
-              />
-              <input
-                type="date"
-                name="birthday"
-                placeholder="01/01/2001"
-                value={editFormData.birthday}
-                onChange={handleEditChange}
-              />
-              <input
-                type="text"
-                name="position"
-                placeholder="position"
-                value={editFormData.position}
-                onChange={handleEditChange}
-              />
-              <input
-                type="role"
-                name="role"
-                placeholder="role"
-                value={editFormData.role}
-                onChange={handleEditChange}
-              />
-              <select
-                name="departmentId"
-                id="departmentId"
-                onChange={handleEditChange}
-                value={editFormData.departmentId}
-              >
-                <option value="">departmentId</option>
-                {departments.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
-  
-              <button type="submit">Save</button>
-              <button onClick={closePopup}>Cancel</button>
-            </form>
+            <div className="popup-inner d-flex justify-content-center align-items-center">
+              <form onSubmit={handleUpdateUser}>
+                <div className="row">
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Name"
+                    value={editFormData.name}
+                    onChange={handleEditChange}
+                  />
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+                    value={editFormData.email}
+                    onChange={handleEditChange}
+                  />
+                </div>
+                <div className="row">
+                  <input
+                    type="text"
+                    name="surname"
+                    placeholder="surname"
+                    value={editFormData.surname}
+                    onChange={handleEditChange}
+                  />
+                  <input
+                    type="text"
+                    name="username"
+                    placeholder="username"
+                    value={editFormData.username}
+                    onChange={handleEditChange}
+                  />
+                </div>
+                <div className="row">
+                  <input
+                    type="phone"
+                    name="phone"
+                    placeholder="phone"
+                    value={editFormData.phone}
+                    onChange={handleEditChange}
+                  />
+                  <input
+                    type="password"
+                    name="password"
+                    placeholder="password"
+                    value={editFormData.password}
+                    onChange={handleEditChange}
+
+                  />
+                </div>
+                <div className="row">
+                  <input
+                    type="date"
+                    name="birthday"
+                    placeholder="01/01/2001"
+                    value={editFormData.birthday}
+                    onChange={handleEditChange}
+                  />
+                  <input
+                    type="text"
+                    name="position"
+                    placeholder="position"
+                    value={editFormData.position}
+                    onChange={handleEditChange}
+                  />
+                </div>
+                <div className="row">
+                  <input
+                    type="role"
+                    name="role"
+                    placeholder="role"
+                    value={editFormData.role}
+                    onChange={handleEditChange}
+                  />
+                  <select
+                    name="departmentId"
+                    id="departmentId"
+                    onChange={handleEditChange}
+                    value={editFormData.departmentId}
+                  >
+                    <option value="">departmentId</option>
+                    {departments.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="row justify-content-between">
+                  <button type="submit" className="btn btn-primary col-4">Save</button>
+                  <button onClick={closePopup} className="btn btn-danger col-4">Cancel</button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
