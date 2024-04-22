@@ -8,6 +8,7 @@ import Departments from "./routes/Departments";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Attendance from "./routes/Attendance";
+import Meetings from "./routes/Meetings";
 const App = () => {
   return (
     <>
@@ -19,6 +20,7 @@ const App = () => {
       <Route path="/users" element={<Users/>}/>
       <Route path="/departments" element={<Departments />} />
       <Route path="/attendance" element={<Attendance />} />
+      <Route path="/meetings" element={<Meetings />} />
       </Routes>
      </div>
      <div className="space"></div>
