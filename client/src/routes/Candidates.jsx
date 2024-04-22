@@ -56,10 +56,7 @@ const Candidates = () => {
     try {
       await axios.post("http://localhost:3001/api/candidates", createFormData);
       setCreateFormData({
-        name: e.target.name.value,
-        surname: e.target.surname.value,
-        email: e.target.email.value,
-        phone: e.target.phone.value,
+        name: e.target.name.value
       });
       console.log(createFormData);
       closeCreatePopup();
@@ -126,7 +123,7 @@ const Candidates = () => {
               <th>Surname</th>
               <th>Email</th>
               <th>Phone</th>
-              <th colSpan={2} className="justify-content-end text-end"><button onClick={() => openCreatePopup(candidates)} className="btn btn-sm btn-success">Add User</button></th>
+              <th colSpan={2} className="justify-content-end text-end"><button onClick={() => openCreatePopup(candidates)} className="btn btn-sm btn-success">Add Candidates</button></th>
             </tr>
             {candidates.map((candidates) => (
               <>
