@@ -10,6 +10,7 @@ import Footer from "./components/Footer";
 import Attendance from "./routes/Attendance";
 import Meetings from "./routes/Meetings";
 import Requests from "./routes/Requests";
+import Candidates from "./routes/Candidates";
 const App = () => {
   return (
     <>
@@ -23,6 +24,7 @@ const App = () => {
             <Route path="/attendance" element={<Attendance />} />
             <Route path="/requests" element={<Requests />} />
             <Route path="/meetings" element={<Meetings />} />
+            <Route path="/candidates" element={<Candidates />} />
           </Routes>
         </div>
         <div className="space"></div>
