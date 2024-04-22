@@ -1,5 +1,6 @@
 // controllers/candidateController.js
 
+const { where } = require('sequelize');
 const { Candidate } = require('../models'); // Import the Candidate model
 
 // Controller for creating a new candidate
@@ -10,7 +11,7 @@ exports.createCandidate = async (req, res) => {
     if (!email ) {
       return res.status(400).json({ message: ' email are required' });
     }  
-      if (await User.findOne({ where:  {email:email}  })) {
+      if (await Candidate.findOne({ where:  {email:email}  })) {
         return res.status(400).json({ message: 'Email address already exists' });
       }
       
@@ -57,10 +58,12 @@ exports.updateCandidateById = async (req, res) => {
     }
     if (!email ) {
       return res.status(400).json({ message: ' email are required' });
-    }  
-      if (await User.findOne({ where:  email  })) {
-        return res.status(400).json({ message: 'Email address already exists' });
-      }
+    }
+    const existingCandidate = await Candidate.findOne({where:{email:email}});
+
+    if (existingCandidate && existingCandidate.email !== candidate.email) {
+      return res.status(400).json({message:'Email address already exists'});
+    }
     await candidate.update(req.body);
     res.status(200).json(candidate);
   } catch (error) {
