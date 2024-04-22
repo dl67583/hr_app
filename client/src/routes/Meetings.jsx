@@ -61,7 +61,7 @@ const Meetings = () => {
             await axios.post("http://localhost:3001/api/timeMeetings", createFormData);
             setCreateFormData({
                 date_and_time: e.target.date_and_time.value,
-                userId: e.target.name.value,
+                userId: e.target.userId.value,
             });
             closeCreatePopup();
             fetchMeetings();
