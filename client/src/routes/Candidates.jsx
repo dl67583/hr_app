@@ -123,7 +123,7 @@ const Candidates = () => {
           <tbody>
             <tr className="table-dark">
               <th>Name</th>
-              <th>Surame</th>
+              <th>Surname</th>
               <th>Email</th>
               <th>Phone</th>
               <th colSpan={2} className="justify-content-end text-end"><button onClick={() => openCreatePopup(candidates)} className="btn btn-sm btn-success">Add User</button></th>
