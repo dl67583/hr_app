@@ -1,4 +1,5 @@
 const { Request } = require('../models');
+const requests = require('../models/requests');
 
 // Controller for creating a new request
 exports.createRequest = async (req, res) => {

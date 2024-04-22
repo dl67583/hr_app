@@ -16,6 +16,7 @@ const Navbar = () => {
           <li><a href="/attendance">Attendance</a></li>
           <li><a href="/candidates">Candidates</a></li>
           <li><a href="/meetings">Meetings</a></li>
+          <li><a href="/requests">Requests</a></li>
         </ul>
         <h1 className="logo">Navbar</h1>
       </div>

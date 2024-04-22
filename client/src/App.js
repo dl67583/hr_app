@@ -8,22 +8,24 @@ import Departments from "./routes/Departments";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Attendance from "./routes/Attendance";
+import Requests from "./routes/Requests";
 const App = () => {
   return (
     <>
-     <BrowserRouter>
-     <Navbar/>
-     <div style={{paddingTop:64}}>
-     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/users" element={<Users/>}/>
-      <Route path="/departments" element={<Departments />} />
-      <Route path="/attendance" element={<Attendance />} />
-      </Routes>
-     </div>
-     <div className="space"></div>
-     <Footer/>
-     
+      <BrowserRouter>
+        <Navbar />
+        <div style={{ paddingTop: 64 }}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/users" element={<Users />} />
+            <Route path="/departments" element={<Departments />} />
+            <Route path="/attendance" element={<Attendance />} />
+            <Route path="/requests" element={<Requests />} />
+          </Routes>
+        </div>
+        <div className="space"></div>
+        <Footer />
+
       </BrowserRouter>
     </>
   );
