@@ -33,8 +33,13 @@ module.exports = (sequelize) => {
   );
 
   Candidate.associate = (models) => {
-    Candidate.belongsToMany(models.Meeting,{through:"meetingCandidate"})
-
+    // Candidate.belongsToMany(models.Meeting, {
+    //   through: "meetingCandidate",
+    //   foreignKey: "CandidateId", // Foreign key in the join table referencing Candidate
+    //   otherKey: "MeetingId", // Foreign key in the join table referencing Meeting
+    //   primaryKey: true // Specify that this foreign key is part of the composite primary key
+    // });
+    
   };
 
   return Candidate;

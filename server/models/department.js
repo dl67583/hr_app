@@ -3,6 +3,12 @@ const db = require("../models")
 
 module.exports = (sequelize) => {
   const Department = sequelize.define('Department', {
+    id:{
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey:true,
+      autoIncrement:true
+    },
     name: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -21,6 +27,8 @@ module.exports = (sequelize) => {
 
   Department.associate = (models) => {
     Department.belongsTo(models.User, { foreignKey: 'headOfDepartmentId' , onDelete:"NO ACTION", allowNull: true});
+    Department.belongsToMany(models.Project, { as: 'DepartmentProjects', through: models.DepartmentProject, foreignKey: 'departmentId'});
+
 
   };
 

@@ -6,6 +6,8 @@ const candidateRoutes = require('./routes/candidateRoutes')
 const meetingRoutes = require ('./routes/meetingRouter')
 const requestRoutes = require('./routes/requestRouter');
 const timeAttendanceRoutes = require('./routes/timeAttendanceRouter');
+const schedulePayments = require('./schedulers/paymentScheduler');
+
  const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -30,6 +32,9 @@ db.sequelize.sync({alter:true}).then(() => {
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
+
+  schedulePayments();
+
 });
 
 app.use(express.static(path.join(__dirname, '../client/build')));

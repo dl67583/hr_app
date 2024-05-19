@@ -4,6 +4,12 @@ module.exports = (sequelize) => {
   const User = sequelize.define(
     "User",
     {
+      id:{
+        type: DataTypes.INTEGER,
+        allowNull:false,
+        primaryKey:true,
+        autoIncrement: true
+      },
       name: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -31,19 +37,14 @@ module.exports = (sequelize) => {
       },
       birthday: {
         type: DataTypes.DATEONLY,
-        allowNull: true,
-      },
-      position: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      role: {
-        type: DataTypes.ENUM("regular user", "admin"),
         allowNull: false,
-        defaultValue: "regular user",
       },
-    },
+      hourlyPay:{
+        type:DataTypes.FLOAT,
+        allowNull:false
+      }    },
     {
+
       indexes: [
         {
           unique: true,
@@ -54,26 +55,25 @@ module.exports = (sequelize) => {
   );
 
   User.associate = (models) => {
-    User.belongsTo(models.Department, {
-      foreignKey: "departmentId",
-      onDelete: "NO ACTION",
-      allowNull: true,
-    });
+  
     User.hasMany(models.TimeAttendance, {
       foreignKey: "userId",
       onDelete: "NO ACTION",
     });
+   
   
     User.hasMany(models.Request, {
       foreignKey: "userId",
       onDelete: "NO ACTION",
     });
     
-    User.belongsToMany(models.Meeting, {
-      through:"meetingUser"
+    User.belongsTo(models.Department, {
+      foreignKey:"departmentId",
+      onDelete:"NO ACTION"
     })
+    User.belongsToMany(models.Role, { as: 'UserRoles', through: models.UserRole, foreignKey: 'userId'});
 
-  };
+}
 
   return User;
 };
