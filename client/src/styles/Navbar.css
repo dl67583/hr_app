@@ -27,8 +27,13 @@
     width: 100%;
     background: #fff;
     color: #000;
-    opacity: 0.85;
+    /* opacity: 0.85; */
     z-index: 100;
+}
+
+.scrolled{
+    opacity: 0.85;
+    transition: 0.5s;
 }
 
 .navbar-container{

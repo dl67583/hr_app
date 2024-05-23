@@ -1,8 +1,21 @@
 import React from 'react';
+import { useState, useEffect } from 'react';
 
 const Navbar = () => {
+
+  const [scroll, setScroll] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => {
+      setScroll(window.scrollY > 60);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
-    <nav className="navbar">
+    <nav className={scroll ? "navbar scrolled" : "navbar"}>
       <div className="navbar-container container d-flex justify-content-between">
         <input type="checkbox" name="" id="" />
         <div className="hamburger-lines">
@@ -15,7 +28,6 @@ const Navbar = () => {
           <li><a href="/departments">Departments</a></li>
           <li><a href="/attendance">Attendance</a></li>
           <li><a href="/candidates">Candidates</a></li>
-          <li><a href="/meetings">Meetings</a></li>
           <li><a href="/requests">Requests</a></li>
         </ul>
         <h1 className="logo">Navbar</h1>

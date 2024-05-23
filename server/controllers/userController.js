@@ -2,16 +2,15 @@ const { User } = require('../models');
 
 
 exports.createUser = async (req, res) => {
-  const {name, surname, email,password, username, role} = req.body
+  const {name, surname, email,password, username} = req.body
   try {
-    console.log(role)
     if (await User.findOne({ where:  {email: email}  })) {
       return res.status(400).json({ message: 'Email address already exists' });
     }
     if (await User.findOne({ where:  {username: username}  })) {
       return res.status(400).json({ message: 'Username address already exists' });
     }
-    if (!name || !email || !password || !username || !role || !surname ) {
+    if (!name || !email || !password || !username ||!surname ) {
       return res.status(400).json({ message: 'Name and email are required' });
     }
    
@@ -63,7 +62,7 @@ exports.updateUserById = async (req, res) => {
     if (await User.findOne({ where:  username  })) {
       return res.status(400).json({ message: 'Username address already exists' });
     }
-    if (!name || !email || !password || !username || !role || !surname ) {
+    if (!name || !email || !password || !username || !surname ) {
       return res.status(400).json({ message: 'Name and email are required' });
     }
    
