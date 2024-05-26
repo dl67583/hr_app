@@ -21,7 +21,6 @@ const Users = () => {
     password: "",
     birthday: "",
     hourlyPay: "",
-    hourlyPay: "",
     departmentId: "",
     roleId:"",
     
@@ -36,7 +35,7 @@ const Users = () => {
     password: "",
     birthday: "",
     hourlyPay: "",
-    hourlyPay: "",
+   
     departmentId: "",
 roleId:"",
   });
@@ -110,7 +109,7 @@ roleId:"",
         phone: e.target.phone.value,
         password: e.target.password.value,
         birthday: new Date(e.target.birthday.value),
-        hourlyPay: null, //e.target.hourlyPay.value
+
         departmentId: e.target.departmentId.value,
         roleId: e.target.roleId.value,
         hourlyPay: e.target.hourlyPay.value,
@@ -185,7 +184,6 @@ roleId:"",
               <th>Hourly Pay</th>
               {/* <th>Position</th>
               <th>Role</th> */}
-              <th>Hourly Pay</th>
               {/* <th>Position</th>
               <th>Role</th> */}
               <th colSpan={2} className="justify-content-end text-end"><button onClick={() => openCreatePopup(users)} className="btn btn-sm btn-success">Add User</button></th>
@@ -201,8 +199,7 @@ roleId:"",
                   <td>{user.departmentId && departments.find(department => department.id === user.departmentId)?.name}</td>
                   <td>{user.hourlyPay}</td>
                   {/* <td>{user.position}</td>
-                  <td>{user.role}</td> */}
-                  <td>{user.hourlyPay}</td>
+          
                   {/* <td>{user.position}</td>
                   <td>{user.role}</td> */}
                   <td><button onClick={() => openPopup(user)} className="btn btn-sm btn-primary">Update</button></td>
@@ -275,13 +272,7 @@ roleId:"",
                     value={createFormData.phone}
                     onChange={handleChange}
                   />
-                  <input
-                    type="phone"
-                    name="phone"
-                    placeholder="phone"
-                    value={createFormData.phone}
-                    onChange={handleChange}
-                  />
+             
                 </div>
                 <div className="row">
                   <input
