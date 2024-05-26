@@ -18,9 +18,7 @@ const Users = () => {
     phone: "",
     password: "",
     birthday: "",
-    position: "",
-    role: "",
-
+    hourlyPay: "",
     departmentId: "",
 
   });
@@ -32,8 +30,7 @@ const Users = () => {
     phone: "",
     password: "",
     birthday: "",
-    position: "",
-    role: "",
+    hourlyPay: "",
     departmentId: "",
 
   });
@@ -86,11 +83,10 @@ const Users = () => {
         phone: e.target.phone.value,
         password: e.target.password.value,
         birthday: new Date(e.target.birthday.value),
-        position: e.target.position.value,
-        role: e.target.role.value,
+        hourlyPay: null, //e.target.hourlyPay.value
         departmentId: e.target.departmentId.value,
       });
-      console.log(createFormData);
+      // console.log(createFormData);
       closeCreatePopup();
       fetchUsers();
       navigate('/users');
@@ -157,8 +153,9 @@ const Users = () => {
               <th>Email</th>
               <th>Phone</th>
               <th>Department</th>
-              <th>Position</th>
-              <th>Role</th>
+              <th>Hourly Pay</th>
+              {/* <th>Position</th>
+              <th>Role</th> */}
               <th colSpan={2} className="justify-content-end text-end"><button onClick={() => openCreatePopup(users)} className="btn btn-sm btn-success">Add User</button></th>
             </tr>
             {users.map((user) => (
@@ -170,8 +167,9 @@ const Users = () => {
                   <td>{user.email}</td>
                   <td>{user.phone}</td>
                   <td>{user.departmentId && departments.find(department => department.id === user.departmentId)?.name}</td>
-                  <td>{user.position}</td>
-                  <td>{user.role}</td>
+                  <td>{user.hourlyPay}</td>
+                  {/* <td>{user.position}</td>
+                  <td>{user.role}</td> */}
                   <td><button onClick={() => openPopup(user)} className="btn btn-sm btn-primary">Update</button></td>
                   <td><button onClick={() => deleteUser(user.id)} className="btn btn-sm btn-danger">Delete</button></td>
                 </tr>
@@ -196,6 +194,22 @@ const Users = () => {
                     onChange={handleChange}
                   />
                   <input
+                    type="text"
+                    name="surname"
+                    placeholder="surname"
+                    value={createFormData.surname}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="row">
+                  <input
+                    type="text"
+                    name="username"
+                    placeholder="username"
+                    value={createFormData.username}
+                    onChange={handleChange}
+                  />
+                  <input
                     type="email"
                     name="email"
                     placeholder="Email"
@@ -205,33 +219,17 @@ const Users = () => {
                 </div>
                 <div className="row">
                   <input
-                    type="text"
-                    name="surname"
-                    placeholder="surname"
-                    value={createFormData.surname}
+                    type="password"
+                    name="password"
+                    placeholder="password"
+                    value={createFormData.password}
                     onChange={handleChange}
                   />
-                  <input
-                    type="text"
-                    name="username"
-                    placeholder="username"
-                    value={createFormData.username}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="row">
                   <input
                     type="phone"
                     name="phone"
                     placeholder="phone"
                     value={createFormData.phone}
-                    onChange={handleChange}
-                  />
-                  <input
-                    type="password"
-                    name="password"
-                    placeholder="password"
-                    value={createFormData.password}
                     onChange={handleChange}
                   />
                 </div>
@@ -241,22 +239,6 @@ const Users = () => {
                     name="birthday"
                     placeholder="01/01/2001"
                     value={createFormData.birthday}
-                    onChange={handleChange}
-                  />
-                  <input
-                    type="text"
-                    name="position"
-                    placeholder="position"
-                    value={createFormData.position}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="row">
-                  <input
-                    type="text"
-                    name="role"
-                    placeholder="role"
-                    value={createFormData.role}
                     onChange={handleChange}
                   />
                   <select
@@ -298,6 +280,22 @@ const Users = () => {
                     onChange={handleEditChange}
                   />
                   <input
+                    type="text"
+                    name="surname"
+                    placeholder="surname"
+                    value={editFormData.surname}
+                    onChange={handleEditChange}
+                  />
+                </div>
+                <div className="row">
+                  <input
+                    type="text"
+                    name="username"
+                    placeholder="username"
+                    value={editFormData.username}
+                    onChange={handleEditChange}
+                  />
+                  <input
                     type="email"
                     name="email"
                     placeholder="Email"
@@ -307,35 +305,19 @@ const Users = () => {
                 </div>
                 <div className="row">
                   <input
-                    type="text"
-                    name="surname"
-                    placeholder="surname"
-                    value={editFormData.surname}
-                    onChange={handleEditChange}
-                  />
-                  <input
-                    type="text"
-                    name="username"
-                    placeholder="username"
-                    value={editFormData.username}
-                    onChange={handleEditChange}
-                  />
-                </div>
-                <div className="row">
-                  <input
-                    type="phone"
-                    name="phone"
-                    placeholder="phone"
-                    value={editFormData.phone}
-                    onChange={handleEditChange}
-                  />
-                  <input
                     type="password"
                     name="password"
                     placeholder="password"
                     value={editFormData.password}
                     onChange={handleEditChange}
 
+                  />
+                  <input
+                    type="phone"
+                    name="phone"
+                    placeholder="phone"
+                    value={editFormData.phone}
+                    onChange={handleEditChange}
                   />
                 </div>
                 <div className="row">
@@ -344,22 +326,6 @@ const Users = () => {
                     name="birthday"
                     placeholder="01/01/2001"
                     value={editFormData.birthday}
-                    onChange={handleEditChange}
-                  />
-                  <input
-                    type="text"
-                    name="position"
-                    placeholder="position"
-                    value={editFormData.position}
-                    onChange={handleEditChange}
-                  />
-                </div>
-                <div className="row">
-                  <input
-                    type="role"
-                    name="role"
-                    placeholder="role"
-                    value={editFormData.role}
                     onChange={handleEditChange}
                   />
                   <select

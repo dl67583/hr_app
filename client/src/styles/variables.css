@@ -1,6 +1,9 @@
 :root{
     --main-dark: 6, 80, 80;
     --main-light: 255,255,255;
+    --logo: #252525;
+    --selected: #115260;
+    --side-main: white;
 }
 
 /* when referencing you write rgba(var(--your-var-here),1) */
