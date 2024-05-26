@@ -8,22 +8,22 @@ import Departments from "./routes/Departments";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Attendance from "./routes/Attendance";
-import Meetings from "./routes/Meetings";
 import Requests from "./routes/Requests";
 import Candidates from "./routes/Candidates";
+import Sidebar from "./components/Sidebar";
 const App = () => {
   return (
     <>
       <BrowserRouter>
         <Navbar />
-        <div style={{ paddingTop: 64 }}>
+        <Sidebar />
+        <div>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/users" element={<Users />} />
             <Route path="/departments" element={<Departments />} />
             <Route path="/attendance" element={<Attendance />} />
             <Route path="/requests" element={<Requests />} />
-            <Route path="/meetings" element={<Meetings />} />
             <Route path="/candidates" element={<Candidates />} />
           </Routes>
         </div>
