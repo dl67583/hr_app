@@ -71,12 +71,24 @@ const checkPermissions = (requiredPermissions) => {
   };
 };
 
-const generateToken = (user) => {
-  return jwt.sign({ userId: user.id, email: user.email }, secret, { expiresIn: '1h' });
+const generateToken = async (user) => {
+  const token = jwt.sign({ userId: user.id, email: user.email }, secret, { expiresIn: '1h' });
+  user.token = token;
+  await user.save();
+  return token;
+};
+
+const removeToken = async (userId) => {
+  const user = await User.findByPk(userId);
+  if (user) {
+    user.token = null;
+    await user.save();
+  }
 };
 
 module.exports = {
   authenticateJWT,
   checkPermissions,
-  generateToken
+  generateToken,
+  removeToken
 };
