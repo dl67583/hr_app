@@ -2,7 +2,7 @@
     position: sticky;
     width: 100%;
     bottom: 0;
-    background-color: #11101d;
+    background-color: #001b24;
     color: #fff;
     padding: 20px;
   }
@@ -17,7 +17,10 @@
   }
   
   .footer p {
-    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
   }
   
   .footer-menu {
