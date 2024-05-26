@@ -40,7 +40,7 @@ module.exports = function(sequelize, DataTypes) {
 
     UserRole.associate = (models) => {
       UserRole.belongsTo(models.User, { foreignKey: 'userId', targetKey: 'id', as: 'User' });
-      UserRole.belongsTo(models.Role, { foreignKey: 'projectId', targetKey: 'id', as: 'Role' });
+      UserRole.belongsTo(models.Project, { foreignKey: 'projectId', targetKey: 'id', as: 'Role' });
     }
 
     return UserRole;

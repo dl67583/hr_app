@@ -1,93 +1,56 @@
-const { User } = require('../models'); 
-
-
-exports.createUser = async (req, res) => {
-  const {name, surname, email,password, username, role} = req.body
-  try {
-    console.log(role)
-    if (await User.findOne({ where:  {email: email}  })) {
-      return res.status(400).json({ message: 'Email address already exists' });
-    }
-    if (await User.findOne({ where:  {username: username}  })) {
-      return res.status(400).json({ message: 'Username address already exists' });
-    }
-    if (!name || !email || !password || !username || !role || !surname ) {
-      return res.status(400).json({ message: 'Name and email are required' });
-    }
-   
-    // Replace null values with undefined to prevent Sequelize from ignoring them
-    const requestBody = Object.fromEntries(
-      Object.entries(req.body).map(([key, value]) => [key, value === "" ? undefined : value])
-    );
-
-    const user = await User.create(requestBody);
-    res.status(201).json(user);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
+const { User, Role } = require('../models');
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.findAll();
+    const users = await User.findAll({ include: [{ model: Role, as: 'UserRoles' }] });
     res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(400).json({ error: error.message });
   }
 };
 
+exports.createUser = async (req, res) => {
+  try {
+    const user = await User.create(req.body);
+    res.status(201).json(user);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
 
 exports.getUserById = async (req, res) => {
   try {
-    const user = await User.findByPk(req.params.id);
+    const user = await User.findByPk(req.params.id, { include: [{ model: Role, as: 'UserRoles' }] });
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ error: 'User not found' });
     }
     res.status(200).json(user);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(400).json({ error: error.message });
   }
 };
 
-
-exports.updateUserById = async (req, res) => {
+exports.updateUser = async (req, res) => {
   try {
-    const user = await User.findByPk(req.params.id);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+    const [updated] = await User.update(req.body, { where: { id: req.params.id } });
+    if (!updated) {
+      return res.status(404).json({ error: 'User not found' });
     }
-    if (await User.findOne({ where:  email  })) {
-      return res.status(400).json({ message: 'Email address already exists' });
-    }
-    if (await User.findOne({ where:  username  })) {
-      return res.status(400).json({ message: 'Username address already exists' });
-    }
-    if (!name || !email || !password || !username || !role || !surname ) {
-      return res.status(400).json({ message: 'Name and email are required' });
-    }
-   
-    // Replace null values with undefined to prevent Sequelize from ignoring them
-    const requestBody = Object.fromEntries(
-      Object.entries(req.body).map(([key, value]) => [key, value === "" ? undefined : value])
-    );
-    await user.update(req.body);
-    res.status(200).json(user);
+    const updatedUser = await User.findByPk(req.params.id);
+    res.status(200).json(updatedUser);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(400).json({ error: error.message });
   }
 };
 
-
-exports.deleteUserById = async (req, res) => {
+exports.deleteUser = async (req, res) => {
   try {
-    const user = await User.findByPk(req.params.id);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+    const deleted = await User.destroy({ where: { id: req.params.id } });
+    if (!deleted) {
+      return res.status(404).json({ error: 'User not found' });
     }
-    await user.destroy();
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(400).json({ error: error.message });
   }
 };

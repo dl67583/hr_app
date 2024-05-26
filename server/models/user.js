@@ -4,11 +4,11 @@ module.exports = (sequelize) => {
   const User = sequelize.define(
     "User",
     {
-      id:{
+      id: {
         type: DataTypes.INTEGER,
-        allowNull:false,
-        primaryKey:true,
-        autoIncrement: true
+        allowNull: false,
+        primaryKey: true,
+        autoIncrement: true,
       },
       name: {
         type: DataTypes.STRING,
@@ -25,7 +25,7 @@ module.exports = (sequelize) => {
       email: {
         type: DataTypes.STRING,
         allowNull: false,
-        // unique: true
+        unique: true,
       },
       phone: {
         type: DataTypes.STRING,
@@ -39,12 +39,12 @@ module.exports = (sequelize) => {
         type: DataTypes.DATEONLY,
         allowNull: false,
       },
-      hourlyPay:{
-        type:DataTypes.FLOAT,
-        allowNull:false
-      }    },
+      hourlyPay: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+      },
+    },
     {
-
       indexes: [
         {
           unique: true,
@@ -55,25 +55,26 @@ module.exports = (sequelize) => {
   );
 
   User.associate = (models) => {
-  
     User.hasMany(models.TimeAttendance, {
       foreignKey: "userId",
       onDelete: "NO ACTION",
     });
-   
-  
+
     User.hasMany(models.Request, {
       foreignKey: "userId",
       onDelete: "NO ACTION",
     });
-    
-    User.belongsTo(models.Department, {
-      foreignKey:"departmentId",
-      onDelete:"NO ACTION"
-    })
-    User.belongsToMany(models.Role, { as: 'UserRoles', through: models.UserRole, foreignKey: 'userId'});
 
-}
+    User.belongsTo(models.Department, {
+      foreignKey: "departmentId",
+      onDelete: "NO ACTION",
+    });
+    User.belongsToMany(models.Role, {
+      as: "UserRoles",
+      through: models.UserRole,
+      foreignKey: "userId",
+    });
+  };
 
   return User;
 };
