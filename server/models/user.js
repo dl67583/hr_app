@@ -41,7 +41,7 @@ module.exports = (sequelize) => {
       },
       hourlyPay: {
         type: DataTypes.FLOAT,
-        allowNull: false,
+        allowNull: true,
       },
     },
     {
@@ -65,10 +65,7 @@ module.exports = (sequelize) => {
       onDelete: "NO ACTION",
     });
 
-    User.belongsTo(models.Department, {
-      foreignKey: "departmentId",
-      onDelete: "NO ACTION",
-    });
+ 
     User.belongsToMany(models.Role, {
       as: "UserRoles",
       through: models.UserRole,

@@ -6,8 +6,10 @@ import '../styles/crud.css';
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
+  const [roles,setRoles ] = useState([])
   const [editUser, setEditUser] = useState(null);
   const [createUsers, setCreateUsers] = useState(null)
+  const [projects, setProjects] = useState([])
   const navigate = useNavigate()
 
   const [createFormData, setCreateFormData] = useState({
@@ -19,7 +21,10 @@ const Users = () => {
     password: "",
     birthday: "",
     hourlyPay: "",
+    hourlyPay: "",
     departmentId: "",
+    roleId:"",
+    
 
   });
   const [editFormData, setEditFormData] = useState({
@@ -31,14 +36,21 @@ const Users = () => {
     password: "",
     birthday: "",
     hourlyPay: "",
+    hourlyPay: "",
     departmentId: "",
-
+roleId:"",
   });
 
-  useEffect(() => {
-    fetchUsers();
-    fetchDepartments();
-  }, []);
+  
+  const fetchRoles = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/api/roles");
+      setRoles(response.data);
+    
+    } catch (error) {
+      console.error("Error fetching Roles:", error);
+    }
+  };
 
   const fetchDepartments = async () => {
     try {
@@ -57,6 +69,22 @@ const Users = () => {
     }
   };
 
+  const fetchProjects = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/api/projects");
+      setProjects(response.data);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+    fetchDepartments();
+    fetchRoles()
+    fetchProjects()
+  },[]);
+
   const handleChange = (e) => {
     setCreateFormData({
       ...createFormData,
@@ -74,7 +102,6 @@ const Users = () => {
     e.preventDefault();
     console.log(e.target);
     try {
-      await axios.post("http://localhost:3001/api/users", createFormData);
       setCreateFormData({
         name: e.target.name.value,
         surname: e.target.surname.value,
@@ -85,6 +112,9 @@ const Users = () => {
         birthday: new Date(e.target.birthday.value),
         hourlyPay: null, //e.target.hourlyPay.value
         departmentId: e.target.departmentId.value,
+        roleId: e.target.roleId.value,
+        hourlyPay: e.target.hourlyPay.value,
+
       });
       // console.log(createFormData);
       closeCreatePopup();
@@ -140,7 +170,6 @@ const Users = () => {
 
   return (
     <div>
-      <h1></h1>
 
 
       <div className="container">
@@ -156,6 +185,9 @@ const Users = () => {
               <th>Hourly Pay</th>
               {/* <th>Position</th>
               <th>Role</th> */}
+              <th>Hourly Pay</th>
+              {/* <th>Position</th>
+              <th>Role</th> */}
               <th colSpan={2} className="justify-content-end text-end"><button onClick={() => openCreatePopup(users)} className="btn btn-sm btn-success">Add User</button></th>
             </tr>
             {users.map((user) => (
@@ -167,6 +199,9 @@ const Users = () => {
                   <td>{user.email}</td>
                   <td>{user.phone}</td>
                   <td>{user.departmentId && departments.find(department => department.id === user.departmentId)?.name}</td>
+                  <td>{user.hourlyPay}</td>
+                  {/* <td>{user.position}</td>
+                  <td>{user.role}</td> */}
                   <td>{user.hourlyPay}</td>
                   {/* <td>{user.position}</td>
                   <td>{user.role}</td> */}
@@ -202,6 +237,8 @@ const Users = () => {
                   />
                 </div>
                 <div className="row">
+                </div>
+                <div className="row">
                   <input
                     type="text"
                     name="username"
@@ -214,8 +251,14 @@ const Users = () => {
                     name="email"
                     placeholder="Email"
                     value={createFormData.email}
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+                    value={createFormData.email}
                     onChange={handleChange}
                   />
+                </div>
+                <div className="row">
                 </div>
                 <div className="row">
                   <input
@@ -223,6 +266,13 @@ const Users = () => {
                     name="password"
                     placeholder="password"
                     value={createFormData.password}
+                    onChange={handleChange}
+                  />
+                  <input
+                    type="phone"
+                    name="phone"
+                    placeholder="phone"
+                    value={createFormData.phone}
                     onChange={handleChange}
                   />
                   <input
@@ -249,6 +299,29 @@ const Users = () => {
                   >
                     <option value="">departmentId</option>
                     {departments.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="row">
+                <input
+                    type="number"
+                    step="0.01"
+                    name="hourlyPay"
+                    placeholder="hourly pay"
+                    value={createFormData.hourlyPay}
+                    onChange={handleChange}
+                  />
+                <select
+                    name="roleId"
+                    id="roleId"
+                    onChange={handleChange}
+                    value={createFormData.roleId}
+                  >
+                    <option value="">role Id</option>
+                    {roles.map((item) => (
                       <option key={item.id} value={item.id}>
                         {item.name}
                       </option>
@@ -288,6 +361,8 @@ const Users = () => {
                   />
                 </div>
                 <div className="row">
+                </div>
+                <div className="row">
                   <input
                     type="text"
                     name="username"
@@ -300,8 +375,14 @@ const Users = () => {
                     name="email"
                     placeholder="Email"
                     value={editFormData.email}
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+                    value={editFormData.email}
                     onChange={handleEditChange}
                   />
+                </div>
+                <div className="row">
                 </div>
                 <div className="row">
                   <input
@@ -311,6 +392,13 @@ const Users = () => {
                     value={editFormData.password}
                     onChange={handleEditChange}
 
+                  />
+                  <input
+                    type="phone"
+                    name="phone"
+                    placeholder="phone"
+                    value={editFormData.phone}
+                    onChange={handleEditChange}
                   />
                   <input
                     type="phone"
@@ -341,6 +429,9 @@ const Users = () => {
                       </option>
                     ))}
                   </select>
+                </div>
+                <div className="row">
+                  
                 </div>
                 <div className="row justify-content-between">
                   <button type="submit" className="btn btn-primary col-4">Save</button>

@@ -17,6 +17,7 @@
     display: none;
 } */
 
+<<<<<<< Updated upstream
 /* .scrolled{
     opacity: 0.85;
     transition: 0.5s;
@@ -58,6 +59,32 @@
     border: none;
     background-color: transparent;
     padding: 0px;
+=======
+.container{
+    max-width: 1200px;
+    width: 90%;
+    margin: auto;
+}
+
+.navbar{
+    box-shadow: 0px 5px 10px 0px #aaa;
+    position: fixed;
+    width: 100%;
+    background: #fff;
+    color: #000;
+    /* opacity: 0.85; */
+    z-index: 100;
+}
+
+.scrolled{
+    opacity: 0.85;
+    transition: 0.5s;
+}
+
+.navbar-container{
+    height: 64px;
+    /* align-items: center; */
+>>>>>>> Stashed changes
 }
 
 .account {
