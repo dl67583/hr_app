@@ -43,6 +43,10 @@ module.exports = (sequelize) => {
         type: DataTypes.FLOAT,
         allowNull: true,
       },
+      token: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
     },
     {
       indexes: [
@@ -64,8 +68,9 @@ module.exports = (sequelize) => {
       foreignKey: "userId",
       onDelete: "NO ACTION",
     });
-
- 
+    User.belongsTo(models.Department, {
+      foreignKey: "departmentId",
+    });
     User.belongsToMany(models.Role, {
       as: "UserRoles",
       through: models.UserRole,

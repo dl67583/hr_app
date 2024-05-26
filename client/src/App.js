@@ -11,6 +11,7 @@ import Attendance from "./routes/Attendance";
 import Requests from "./routes/Requests";
 import Candidates from "./routes/Candidates";
 import Sidebar from "./components/Sidebar";
+import Login from "./routes/Login";
 const App = () => {
   return (
     <>
@@ -25,6 +26,7 @@ const App = () => {
             <Route path="/attendance" element={<Attendance />} />
             <Route path="/requests" element={<Requests />} />
             <Route path="/candidates" element={<Candidates />} />
+            <Route path="/login" element={<Login />} />
           </Routes>
         </div>
         <div className="space"></div>

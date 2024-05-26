@@ -1,12 +1,13 @@
 const { User, UserRole } = require('../models'); // Ensure UserRole is imported
 const bcrypt = require('bcrypt');
 const { Op } = require('sequelize');
+const { generateToken, removeToken } = require('../middlewares/auth');
 
 // Create a new user
 exports.createUser = async (req, res) => {
   try {
     const { name, surname, username, email, phone, password, birthday, hourlyPay, departmentId, roleId } = req.body;
-    
+    const token = null;
     // Hash the password before saving to the database
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -19,7 +20,8 @@ exports.createUser = async (req, res) => {
       password: hashedPassword,
       birthday,
       hourlyPay,
-      departmentId
+      departmentId,
+      token
     });
 
     // Create entry in the UserRole table
@@ -69,7 +71,7 @@ exports.updateUser = async (req, res) => {
     const { name, surname, username, email, phone, birthday, hourlyPay, departmentId } = req.body;
 
     const user = await User.findByPk(id);
-
+    const token = user.token;
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -82,7 +84,8 @@ exports.updateUser = async (req, res) => {
       phone,
       birthday,
       hourlyPay,
-      departmentId
+      departmentId,
+      token
     });
 
     res.status(200).json(updatedUser);
@@ -102,6 +105,7 @@ exports.deleteUser = async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    await removeToken(user.id);
     await user.destroy();
     res.status(204).send();
   } catch (error) {

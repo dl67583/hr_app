@@ -6,7 +6,7 @@ import '../styles/crud.css';
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
-  const [roles,setRoles ] = useState([])
+  const [roles, setRoles] = useState([])
   const [editUser, setEditUser] = useState(null);
   const [createUsers, setCreateUsers] = useState(null)
   const [projects, setProjects] = useState([])
@@ -22,9 +22,8 @@ const Users = () => {
     birthday: "",
     hourlyPay: "",
     departmentId: "",
-    roleId:"",
-    
-
+    roleId: "",
+    token: ""
   });
   const [editFormData, setEditFormData] = useState({
     name: "",
@@ -35,17 +34,16 @@ const Users = () => {
     password: "",
     birthday: "",
     hourlyPay: "",
-   
     departmentId: "",
-roleId:"",
+    roleId: "",
   });
 
-  
+
   const fetchRoles = async () => {
     try {
       const response = await axios.get("http://localhost:3001/api/roles");
       setRoles(response.data);
-    
+
     } catch (error) {
       console.error("Error fetching Roles:", error);
     }
@@ -82,7 +80,7 @@ roleId:"",
     fetchDepartments();
     fetchRoles()
     fetchProjects()
-  },[]);
+  }, []);
 
   const handleChange = (e) => {
     setCreateFormData({
@@ -99,7 +97,6 @@ roleId:"",
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(e.target);
     try {
       setCreateFormData({
         name: e.target.name.value,
@@ -109,13 +106,12 @@ roleId:"",
         phone: e.target.phone.value,
         password: e.target.password.value,
         birthday: new Date(e.target.birthday.value),
-
         departmentId: e.target.departmentId.value,
         roleId: e.target.roleId.value,
         hourlyPay: e.target.hourlyPay.value,
-
+        token: null,
       });
-      // console.log(createFormData);
+      await axios.post(`http://localhost:3001/api/users`, createFormData);
       closeCreatePopup();
       fetchUsers();
       navigate('/users');
@@ -248,10 +244,6 @@ roleId:"",
                     name="email"
                     placeholder="Email"
                     value={createFormData.email}
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    value={createFormData.email}
                     onChange={handleChange}
                   />
                 </div>
@@ -272,7 +264,7 @@ roleId:"",
                     value={createFormData.phone}
                     onChange={handleChange}
                   />
-             
+
                 </div>
                 <div className="row">
                   <input
@@ -297,7 +289,7 @@ roleId:"",
                   </select>
                 </div>
                 <div className="row">
-                <input
+                  <input
                     type="number"
                     step="0.01"
                     name="hourlyPay"
@@ -305,7 +297,7 @@ roleId:"",
                     value={createFormData.hourlyPay}
                     onChange={handleChange}
                   />
-                <select
+                  <select
                     name="roleId"
                     id="roleId"
                     onChange={handleChange}
@@ -366,10 +358,6 @@ roleId:"",
                     name="email"
                     placeholder="Email"
                     value={editFormData.email}
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    value={editFormData.email}
                     onChange={handleEditChange}
                   />
                 </div>
@@ -383,13 +371,6 @@ roleId:"",
                     value={editFormData.password}
                     onChange={handleEditChange}
 
-                  />
-                  <input
-                    type="phone"
-                    name="phone"
-                    placeholder="phone"
-                    value={editFormData.phone}
-                    onChange={handleEditChange}
                   />
                   <input
                     type="phone"
@@ -422,7 +403,7 @@ roleId:"",
                   </select>
                 </div>
                 <div className="row">
-                  
+
                 </div>
                 <div className="row justify-content-between">
                   <button type="submit" className="btn btn-primary col-4">Save</button>
