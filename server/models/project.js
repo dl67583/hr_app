@@ -1,26 +1,31 @@
-const {DataTypes} = require ("sequelize")
-module.exports =  (sequelize) => {
-    const  Project = sequelize.define("Project", {
-        id:{
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            primaryKey:true,
-            autoIncrement:true
-          },
-          name: {
-            type: DataTypes.STRING,
-            allowNull: false,
-          }
+const { DataTypes } = require('sequelize');
 
+module.exports = (sequelize) => {
+  const Project = sequelize.define('Project', {
+    id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  });
 
-          
-
-
+  Project.associate = (models) => {
+    Project.belongsToMany(models.Department, {
+      through: models.DepartmentProject,
+      foreignKey: 'projectId',
+      as: 'Departments'
     });
-    Project.associate = (models) => {
-        Project.belongsToMany(models.Department, { as: 'DepartmentProjects', through: models.DepartmentProject, foreignKey: 'ProjectId'});
+    Project.belongsToMany(models.Role, {
+      through: models.RolePermission,
+      foreignKey: 'projectId',
+      as: 'Roles'
+    });
+  };
 
-      }
-
-      return Project
-}
+  return Project;
+};

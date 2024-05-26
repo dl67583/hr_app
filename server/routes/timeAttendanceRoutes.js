@@ -1,12 +1,11 @@
 const express = require('express');
-const router = express.Router();
 const timeAttendanceController = require('../controllers/timeAttendanceController');
+const router = express.Router();
 
-// Routes for time attendance
 router.post('/', timeAttendanceController.createTimeAttendance);
-router.get('/', timeAttendanceController.getAllTimeAttendance);
+router.get('/', timeAttendanceController.getTimeAttendances);
 router.get('/:id', timeAttendanceController.getTimeAttendanceById);
-router.put('/:id', timeAttendanceController.updateTimeAttendanceById);
-router.delete('/:id', timeAttendanceController.deleteTimeAttendanceById);
+router.put('/:id', timeAttendanceController.updateTimeAttendance);
+router.delete('/:id', timeAttendanceController.deleteTimeAttendance);
 
 module.exports = router;

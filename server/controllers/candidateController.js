@@ -47,7 +47,7 @@ exports.getCandidateById = async (req, res) => {
 };
 
 // Controller for updating a candidate by ID
-exports.updateCandidateById = async (req, res) => {
+exports.updateCandidate = async (req, res) => {
   const { email} = req.body
 
   try {
@@ -72,7 +72,7 @@ exports.updateCandidateById = async (req, res) => {
 };
 
 // Controller for deleting a candidate by ID
-exports.deleteCandidateById = async (req, res) => {
+exports.deleteCandidate = async (req, res) => {
   try {
     const candidate = await Candidate.findByPk(req.params.id);
     if (!candidate) {

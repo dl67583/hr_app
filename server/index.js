@@ -3,10 +3,10 @@ const db = require('./models');
 const userRoutes = require('./routes/userRoutes');
 const departmentRoutes = require('./routes/departmentRoutes')
 const candidateRoutes = require('./routes/candidateRoutes')
-const meetingRoutes = require ('./routes/meetingRouter')
-const requestRoutes = require('./routes/requestRouter');
-const timeAttendanceRoutes = require('./routes/timeAttendanceRouter');
 const schedulePayments = require('./schedulers/paymentScheduler');
+const roleRoutes = require('./routes/roleRoutes')
+const projectRoutes = require('./routes/projectRoutes')
+const paymentRoutes = require('./routes/paymentRoutes')
 
  const path = require('path');
 const app = express();
@@ -21,9 +21,9 @@ app.use(express.json());
 app.use('/api/users', userRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/candidates', candidateRoutes);
-app.use('/api/meetings', meetingRoutes);
-app.use('/api/requests',requestRoutes);
-app.use('/api/timeAttendance',timeAttendanceRoutes)
+app.use('/api/roles', roleRoutes);
+app.use('/api/projects', projectRoutes);
+app.use('/api/payments', paymentRoutes);
 
 
 db.sequelize.sync({alter:true}).then(() => {

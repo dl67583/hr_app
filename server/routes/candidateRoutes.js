@@ -1,14 +1,12 @@
-    // routes/candidateRoutes.js
-
 const express = require('express');
+const candidatesController = require('../controllers/candidateController');
+const { checkPermissions } = require('../middlewares/auth');
 const router = express.Router();
-const candidateController = require('../controllers/candidatesController');
 
-// Routes for candidates
-router.get('/', candidateController.getAllCandidates);
-router.get('/:id', candidateController.getCandidateById);
-router.post('/', candidateController.createCandidate);
-router.put('/:id', candidateController.updateCandidateById);
-router.delete('/:id', candidateController.deleteCandidateById);
+router.post('/', checkPermissions(['create_candidate']), candidatesController.createCandidate);
+router.get('/', checkPermissions(['view_candidates']), candidatesController.getAllCandidates);
+router.get('/:id', checkPermissions(['view_candidate']), candidatesController.getCandidateById);
+router.put('/:id', checkPermissions(['edit_candidate']), candidatesController.updateCandidate);
+router.delete('/:id', checkPermissions(['delete_candidate']), candidatesController.deleteCandidate);
 
 module.exports = router;
