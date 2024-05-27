@@ -1,93 +1,114 @@
-const { User } = require('../models'); 
+const { User, UserRole } = require('../models'); // Ensure UserRole is imported
+const bcrypt = require('bcrypt');
+const { Op } = require('sequelize');
+const { generateToken, removeToken } = require('../middlewares/auth');
 
-
+// Create a new user
 exports.createUser = async (req, res) => {
-  const {name, surname, email,password, username, role} = req.body
   try {
-    console.log(role)
-    if (await User.findOne({ where:  {email: email}  })) {
-      return res.status(400).json({ message: 'Email address already exists' });
-    }
-    if (await User.findOne({ where:  {username: username}  })) {
-      return res.status(400).json({ message: 'Username address already exists' });
-    }
-    if (!name || !email || !password || !username || !role || !surname ) {
-      return res.status(400).json({ message: 'Name and email are required' });
-    }
-   
-    // Replace null values with undefined to prevent Sequelize from ignoring them
-    const requestBody = Object.fromEntries(
-      Object.entries(req.body).map(([key, value]) => [key, value === "" ? undefined : value])
-    );
+    const { name, surname, username, email, phone, password, birthday, hourlyPay, departmentId, roleId } = req.body;
+    const token = null;
+    // Hash the password before saving to the database
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create(requestBody);
-    res.status(201).json(user);
+    const newUser = await User.create({
+      name,
+      surname,
+      username,
+      email,
+      phone,
+      password: hashedPassword,
+      birthday,
+      hourlyPay,
+      departmentId,
+      token
+    });
+
+    // Create entry in the UserRole table
+    if (roleId) {
+      await UserRole.create({
+        userId: newUser.id,
+        roleId
+      });
+    }
+
+    res.status(201).json(newUser);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(400).json({ error: error.message });
   }
 };
 
-
+// Retrieve all users
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.findAll();
     res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
-
+// Retrieve a single user by ID
 exports.getUserById = async (req, res) => {
   try {
-    const user = await User.findByPk(req.params.id);
+    const { id } = req.params;
+    const user = await User.findByPk(id);
+
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ error: 'User not found' });
     }
+
     res.status(200).json(user);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
-
-exports.updateUserById = async (req, res) => {
+// Update a user by ID
+exports.updateUser = async (req, res) => {
   try {
-    const user = await User.findByPk(req.params.id);
+    const { id } = req.params;
+    const { name, surname, username, email, phone, birthday, hourlyPay, departmentId } = req.body;
+
+    const user = await User.findByPk(id);
+    const token = user.token;
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ error: 'User not found' });
     }
-    if (await User.findOne({ where:  email  })) {
-      return res.status(400).json({ message: 'Email address already exists' });
-    }
-    if (await User.findOne({ where:  username  })) {
-      return res.status(400).json({ message: 'Username address already exists' });
-    }
-    if (!name || !email || !password || !username || !role || !surname ) {
-      return res.status(400).json({ message: 'Name and email are required' });
-    }
-   
-    // Replace null values with undefined to prevent Sequelize from ignoring them
-    const requestBody = Object.fromEntries(
-      Object.entries(req.body).map(([key, value]) => [key, value === "" ? undefined : value])
-    );
-    await user.update(req.body);
-    res.status(200).json(user);
+
+    const updatedUser = await user.update({
+      name,
+      surname,
+      username,
+      email,
+      phone,
+      birthday,
+      hourlyPay,
+      departmentId,
+      token
+    });
+
+    res.status(200).json(updatedUser);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(400).json({ error: error.message });
   }
 };
 
-
-exports.deleteUserById = async (req, res) => {
+// Delete a user by ID
+exports.deleteUser = async (req, res) => {
   try {
-    const user = await User.findByPk(req.params.id);
+    const { id } = req.params;
+
+    const user = await User.findByPk(id);
+
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ error: 'User not found' });
     }
+
+    await removeToken(user.id);
     await user.destroy();
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ error: error.message });
   }
 };

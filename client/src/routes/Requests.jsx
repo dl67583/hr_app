@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import '../styles/crud.css';
-import Users from "./Users";
+
 
 const Requests = () => {
     const [requests, setRequests] = useState([]);
@@ -178,7 +178,11 @@ const Requests = () => {
                                     />
                                 </div>
                                 <div className="row">
+<<<<<<< HEAD
 
+=======
+                                   
+>>>>>>> beee4dae0a06c52131c59bde81b47eda43b276b1
                                     <select
                                         name="userId"
                                         id="userId"
@@ -186,7 +190,7 @@ const Requests = () => {
                                         value={createFormData.userId}
                                     >
                                         <option value="">userId</option>
-                                        {Users.map((item) => (
+                                        {users.map((item) => (
                                             <option key={item.id} value={item.id}>
                                                 {item.name} {item.surname}
                                             </option>

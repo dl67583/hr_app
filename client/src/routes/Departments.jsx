@@ -9,13 +9,11 @@ const Departments = () => {
   const [editDepartment, setEditDepartment] = useState(null);
   const [createDepartment, setCreateDepartment] = useState(null);
   const [createFormData, setCreateFormData] = useState({
-    name: "",
-    headOfDepartmentId: ""
+    name: ""
 
   });
   const [editFormData, setEditFormData] = useState({
-    name: "",
-    headOfDepartmentId: ""
+    name: ""
 
   });
 
@@ -58,11 +56,10 @@ const Departments = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(e.target);
     try {
       await axios.post("http://localhost:3001/api/departments", createFormData);
       setCreateFormData({
-        name: e.target.name.value,
+        name: e.target.name.value
       });
       closeCreatePopup();
       fetchDepartments();
@@ -79,7 +76,8 @@ const Departments = () => {
       console.error("Error deleting department:", error);
     }
   };
-  const handleUpdateDepartment = async () => {
+  const handleUpdateDepartment = async (e) => {
+    e.preventDefault()
     try {
       await axios.put(
         `http://localhost:3001/api/departments/${editDepartment.id}`,
@@ -117,14 +115,14 @@ const Departments = () => {
           <tbody>
             <tr className="table-dark">
               <th>Department</th>
-              <th>Head of Department</th>
+
               <th colSpan={2} className="justify-content-end text-end"><button onClick={() => openCreatePopup(departments)} className="btn btn-sm btn-success">Add Department</button></th>
             </tr>
             {departments.map((department) => (
               <>
                 <tr key={department.id} className="table-light">
                   <td>{department.name}</td>
-                  <td>{department.headOfDepartmentId && users.find(user => user.id === department.headOfDepartmentId)?.name}</td>
+            
                   <td><button onClick={() => openPopup(department)} className="btn btn-sm btn-primary">Update</button></td>
                   <td><button onClick={() => deleteDepartment(department.id)} className="btn btn-sm btn-danger">Delete</button></td>
                 </tr>
@@ -148,19 +146,7 @@ const Departments = () => {
                     onChange={handleChange}
                   />
 
-                  <select
-                    name="headOfDepartmentId"
-                    id="headOfDepartmentId"
-                    onChange={handleChange}
-                    value={createFormData.headOfDepartmentId}
-                  >
-                    <option value="">headOfDepartment</option>
-                    {users.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.name} {item.surname}
-                      </option>
-                    ))}
-                  </select>
+              
                 </div>
 
                 <div className="row">
@@ -187,21 +173,7 @@ const Departments = () => {
                   onChange={handleEditChange}
                 />
 
-                <select
-                  name="headOfDepartmentId"
-                  id="headOfDepartmentId"
-                  onChange={handleEditChange}
-                  value={editFormData.headOfDepartmentId}
-                >
-                  <option value="">headOfDepartment</option>
-                  {users.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.name} - {item.surname}
-
-                    </option>
-                  ))}
-                </select>
-
+               
                 <button type="submit">Save</button>
                 <button onClick={closePopup}>Cancel</button>
               </form>
