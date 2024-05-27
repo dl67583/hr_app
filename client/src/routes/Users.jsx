@@ -2,12 +2,16 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import '../styles/crud.css';
+import Swal from 'sweetalert2'
+
 
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
+  const [roles, setRoles] = useState([])
   const [editUser, setEditUser] = useState(null);
   const [createUsers, setCreateUsers] = useState(null)
+  const [projects, setProjects] = useState([])
   const navigate = useNavigate()
 
   const [createFormData, setCreateFormData] = useState({
@@ -20,7 +24,8 @@ const Users = () => {
     birthday: "",
     hourlyPay: "",
     departmentId: "",
-
+    roleId: "",
+    token: ""
   });
   const [editFormData, setEditFormData] = useState({
     name: "",
@@ -32,20 +37,36 @@ const Users = () => {
     birthday: "",
     hourlyPay: "",
     departmentId: "",
-
+    roleId: "",
   });
 
-  useEffect(() => {
-    fetchUsers();
-    fetchDepartments();
-  }, []);
+
+  const fetchRoles = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/api/roles");
+      setRoles(response.data);
+
+    } catch (error) {
+      Swal.fire({
+        title: 'Error!',
+        text: error,
+        icon: 'error',
+        confirmButtonText: 'Close'
+      })
+    }
+  };
 
   const fetchDepartments = async () => {
     try {
       const response = await axios.get("http://localhost:3001/api/departments");
       setDepartments(response.data);
     } catch (error) {
-      console.error("Error fetching departments:", error);
+      Swal.fire({
+        title: 'Error!',
+        text: error,
+        icon: 'error',
+        confirmButtonText: 'Close'
+      })
     }
   };
   const fetchUsers = async () => {
@@ -53,9 +74,35 @@ const Users = () => {
       const response = await axios.get("http://localhost:3001/api/users");
       setUsers(response.data);
     } catch (error) {
-      console.error("Error fetching users:", error);
+      Swal.fire({
+        title: 'Error!',
+        text: error,
+        icon: 'error',
+        confirmButtonText: 'Close'
+      })
     }
   };
+
+  const fetchProjects = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/api/projects");
+      setProjects(response.data);
+    } catch (error) {
+      Swal.fire({
+        title: 'Error!',
+        text: error,
+        icon: 'error',
+        confirmButtonText: 'Close'
+      })
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+    fetchDepartments();
+    fetchRoles()
+    fetchProjects()
+  }, []);
 
   const handleChange = (e) => {
     setCreateFormData({
@@ -72,9 +119,7 @@ const Users = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(e.target);
     try {
-      await axios.post("http://localhost:3001/api/users", createFormData);
       setCreateFormData({
         name: e.target.name.value,
         surname: e.target.surname.value,
@@ -82,17 +127,27 @@ const Users = () => {
         email: e.target.email.value,
         phone: e.target.phone.value,
         password: e.target.password.value,
-        birthday: new Date(e.target.birthday.value),
-        hourlyPay: null, //e.target.hourlyPay.value
+        birthday: e.target.birthday.value,
         departmentId: e.target.departmentId.value,
+        roleId: e.target.roleId.value,
+        hourlyPay: e.target.hourlyPay.value,
+        token: null,
       });
-      // console.log(createFormData);
+     
+      await axios.post(`http://localhost:3001/api/users`, createFormData);
+    
       closeCreatePopup();
       fetchUsers();
       navigate('/users');
 
     } catch (error) {
-      console.error("Error creating user:", error);
+
+      Swal.fire({
+        title: 'Error!',
+        text:"Error creating user: " + error.response.data.error,
+        icon: 'error',
+        confirmButtonText: 'Close'
+      })
     }
   };
 
@@ -103,7 +158,12 @@ const Users = () => {
       navigate('/users');
 
     } catch (error) {
-      console.error("Error deleting user:", error);
+      Swal.fire({
+        title: 'Error!',
+        text: "Error deleting user: " +error.response.data.error,
+        icon: 'error',
+        confirmButtonText: 'Close'
+      })
     }
   };
 
@@ -117,7 +177,12 @@ const Users = () => {
       fetchUsers();
       navigate('/users');
     } catch (error) {
-      console.error("Error updating user:", error);
+      Swal.fire({
+        title: 'Error!',
+        text: "Error updating user: " +error.response.data.error,
+        icon: 'error',
+        confirmButtonText: 'Close'
+      })
     }
   };
 
@@ -140,7 +205,6 @@ const Users = () => {
 
   return (
     <div>
-      <h1></h1>
 
 
       <div className="container">
@@ -156,6 +220,8 @@ const Users = () => {
               <th>Hourly Pay</th>
               {/* <th>Position</th>
               <th>Role</th> */}
+              {/* <th>Position</th>
+              <th>Role</th> */}
               <th colSpan={2} className="justify-content-end text-end"><button onClick={() => openCreatePopup(users)} className="btn btn-sm btn-success">Add User</button></th>
             </tr>
             {users.map((user) => (
@@ -168,6 +234,8 @@ const Users = () => {
                   <td>{user.phone}</td>
                   <td>{user.departmentId && departments.find(department => department.id === user.departmentId)?.name}</td>
                   <td>{user.hourlyPay}</td>
+                  {/* <td>{user.position}</td>
+          
                   {/* <td>{user.position}</td>
                   <td>{user.role}</td> */}
                   <td><button onClick={() => openPopup(user)} className="btn btn-sm btn-primary">Update</button></td>
@@ -202,6 +270,8 @@ const Users = () => {
                   />
                 </div>
                 <div className="row">
+                </div>
+                <div className="row">
                   <input
                     type="text"
                     name="username"
@@ -218,6 +288,8 @@ const Users = () => {
                   />
                 </div>
                 <div className="row">
+                </div>
+                <div className="row">
                   <input
                     type="password"
                     name="password"
@@ -232,6 +304,7 @@ const Users = () => {
                     value={createFormData.phone}
                     onChange={handleChange}
                   />
+
                 </div>
                 <div className="row">
                   <input
@@ -249,6 +322,29 @@ const Users = () => {
                   >
                     <option value="">departmentId</option>
                     {departments.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="row">
+                  <input
+                    type="number"
+                    step="0.01"
+                    name="hourlyPay"
+                    placeholder="hourly pay"
+                    value={createFormData.hourlyPay}
+                    onChange={handleChange}
+                  />
+                  <select
+                    name="roleId"
+                    id="roleId"
+                    onChange={handleChange}
+                    value={createFormData.roleId}
+                  >
+                    <option value="">role Id</option>
+                    {roles.map((item) => (
                       <option key={item.id} value={item.id}>
                         {item.name}
                       </option>
@@ -288,6 +384,8 @@ const Users = () => {
                   />
                 </div>
                 <div className="row">
+                </div>
+                <div className="row">
                   <input
                     type="text"
                     name="username"
@@ -302,6 +400,8 @@ const Users = () => {
                     value={editFormData.email}
                     onChange={handleEditChange}
                   />
+                </div>
+                <div className="row">
                 </div>
                 <div className="row">
                   <input
@@ -341,6 +441,9 @@ const Users = () => {
                       </option>
                     ))}
                   </select>
+                </div>
+                <div className="row">
+
                 </div>
                 <div className="row justify-content-between">
                   <button type="submit" className="btn btn-primary col-4">Save</button>

@@ -41,14 +41,18 @@ module.exports = (sequelize) => {
       },
       hourlyPay: {
         type: DataTypes.FLOAT,
-        allowNull: false,
+        allowNull: true,
+      },
+      token: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
     },
     {
       indexes: [
         {
           unique: true,
-          fields: ["email"],
+          fields: ["email", "username"],
         },
       ],
     }
@@ -57,17 +61,15 @@ module.exports = (sequelize) => {
   User.associate = (models) => {
     User.hasMany(models.TimeAttendance, {
       foreignKey: "userId",
-      onDelete: "NO ACTION",
+   
     });
 
     User.hasMany(models.Request, {
       foreignKey: "userId",
-      onDelete: "NO ACTION",
+   
     });
-
     User.belongsTo(models.Department, {
       foreignKey: "departmentId",
-      onDelete: "NO ACTION",
     });
     User.belongsToMany(models.Role, {
       as: "UserRoles",

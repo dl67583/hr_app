@@ -11,7 +11,7 @@ exports.createRole = async (req, res) => {
 
 exports.getAllRoles = async (req, res) => {
   try {
-    const roles = await Role.findAll({ include: [{ model: Permission, as: 'Permissions' }] });
+    const roles = await Role.findAll( );
     res.status(200).json(roles);
   } catch (error) {
     res.status(400).json({ error: error.message });

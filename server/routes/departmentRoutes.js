@@ -7,8 +7,8 @@ const { authenticateJWT, checkPermissions } = require('../middlewares/auth');
 router.get('/', departmentController.getAllDepartments);
 
 // Protected routes with role and permission checks
-router.post('/', authenticateJWT, checkPermissions(['write']), departmentController.createDepartment);
-router.put('//:id', authenticateJWT, checkPermissions(['write']), departmentController.updateDepartment);
-router.delete('//:id', authenticateJWT, checkPermissions(['write']), departmentController.deleteDepartment);
+router.post('/',  departmentController.createDepartment);
+router.put('/:id',  departmentController.updateDepartment);
+router.delete('/:id',  departmentController.deleteDepartment);
 
 module.exports = router;

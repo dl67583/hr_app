@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import '../styles/crud.css';
-import Users from "./Users";
+
 
 const Requests = () => {
     const [requests, setRequests] = useState([]);
@@ -178,14 +178,6 @@ const Requests = () => {
                                     />
                                 </div>
                                 <div className="row">
-                                    <input
-                                        type="userId"
-                                        name="userId"
-                                        placeholder="userId"
-                                        value={createFormData.userId}
-                                        onChange={handleChange}
-
-                                    />
                                     <select
                                         name="userId"
                                         id="userId"
@@ -193,7 +185,7 @@ const Requests = () => {
                                         value={createFormData.userId}
                                     >
                                         <option value="">userId</option>
-                                        {Users.map((item) => (
+                                        {users.map((item) => (
                                             <option key={item.id} value={item.id}>
                                                 {item.name} {item.surname}
                                             </option>
