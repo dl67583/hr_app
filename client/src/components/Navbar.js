@@ -31,10 +31,7 @@ const Navbar = () => {
   // };
 
   return (
-    <div className={`nav d-flex justify-content-between ${isSidebarOpen ? "sidebar-open" : ""}`}>
-      <button className="nav-menu col-2 d-flex align-items-center justify-content-center" onClick={toggleSidebar}>HR App</button>
-      <div className="nav-container col-10 d-flex align-items-center">
-        <div className="ms-5">
+
     <div className={`nav d-flex justify-content-between ${isSidebarOpen ? "sidebar-open" : ""}`}>
       <button className="nav-menu col-2 d-flex align-items-center justify-content-center" onClick={toggleSidebar}>HR App</button>
       <div className="nav-container col-10 d-flex align-items-center">
@@ -47,7 +44,7 @@ const Navbar = () => {
         </button>
       </div>
     </div>
-    </div>
+  
   );
 };
 

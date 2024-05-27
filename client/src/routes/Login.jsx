@@ -12,7 +12,7 @@ const Login = () => {
     const handleLogin = async (event) => {
         event.preventDefault();
         try {
-          const response = await axios.post(`http://localhost:3001/api/login`, { username, password });
+          const response = await axios.post(`http://localhost:3001/api/auth/login`, { username, password });
           localStorage.setItem('token', response.data.token);
           navigate('/users');
         } catch (error) {

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import '../styles/crud.css';
+import Swal from 'sweetalert2'
+
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -45,7 +47,12 @@ const Users = () => {
       setRoles(response.data);
 
     } catch (error) {
-      console.error("Error fetching Roles:", error);
+      Swal.fire({
+        title: 'Error!',
+        text: error,
+        icon: 'error',
+        confirmButtonText: 'Close'
+      })
     }
   };
 
@@ -54,7 +61,12 @@ const Users = () => {
       const response = await axios.get("http://localhost:3001/api/departments");
       setDepartments(response.data);
     } catch (error) {
-      console.error("Error fetching departments:", error);
+      Swal.fire({
+        title: 'Error!',
+        text: error,
+        icon: 'error',
+        confirmButtonText: 'Close'
+      })
     }
   };
   const fetchUsers = async () => {
@@ -62,7 +74,12 @@ const Users = () => {
       const response = await axios.get("http://localhost:3001/api/users");
       setUsers(response.data);
     } catch (error) {
-      console.error("Error fetching users:", error);
+      Swal.fire({
+        title: 'Error!',
+        text: error,
+        icon: 'error',
+        confirmButtonText: 'Close'
+      })
     }
   };
 
@@ -71,7 +88,12 @@ const Users = () => {
       const response = await axios.get("http://localhost:3001/api/projects");
       setProjects(response.data);
     } catch (error) {
-      console.error("Error fetching projects:", error);
+      Swal.fire({
+        title: 'Error!',
+        text: error,
+        icon: 'error',
+        confirmButtonText: 'Close'
+      })
     }
   };
 
@@ -105,20 +127,27 @@ const Users = () => {
         email: e.target.email.value,
         phone: e.target.phone.value,
         password: e.target.password.value,
-        birthday: new Date(e.target.birthday.value),
+        birthday: e.target.birthday.value,
         departmentId: e.target.departmentId.value,
         roleId: e.target.roleId.value,
         hourlyPay: e.target.hourlyPay.value,
         token: null,
       });
+     
       await axios.post(`http://localhost:3001/api/users`, createFormData);
-      await axios.post(`http://localhost:3001/api/users`, createFormData);
+    
       closeCreatePopup();
       fetchUsers();
       navigate('/users');
 
     } catch (error) {
-      console.error("Error creating user:", error);
+
+      Swal.fire({
+        title: 'Error!',
+        text:"Error creating user: " + error.response.data.error,
+        icon: 'error',
+        confirmButtonText: 'Close'
+      })
     }
   };
 
@@ -129,7 +158,12 @@ const Users = () => {
       navigate('/users');
 
     } catch (error) {
-      console.error("Error deleting user:", error);
+      Swal.fire({
+        title: 'Error!',
+        text: "Error deleting user: " +error.response.data.error,
+        icon: 'error',
+        confirmButtonText: 'Close'
+      })
     }
   };
 
@@ -143,7 +177,12 @@ const Users = () => {
       fetchUsers();
       navigate('/users');
     } catch (error) {
-      console.error("Error updating user:", error);
+      Swal.fire({
+        title: 'Error!',
+        text: "Error updating user: " +error.response.data.error,
+        icon: 'error',
+        confirmButtonText: 'Close'
+      })
     }
   };
 
