@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSidebar } from '../context/sidebarContext';
 import "../styles/Navbar.css";
 
@@ -6,6 +7,7 @@ const Navbar = () => {
   const { toggleSidebar } = useSidebar();
   const { isSidebarOpen } = useSidebar();
   const [scroll, setScroll] = useState(false);
+  const nav = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,14 +18,17 @@ const Navbar = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+  const navigateToLogin = () => {
+    nav("/login");
+  }
 
   const [search, setSearch] = useState("");
   const [login, setLogin] = useState(false);
   const [settings, setSettings] = useState(false);
 
-  const toggleSettings = () => {
-    setSettings(!settings);
-  };
+  // const toggleSettings = () => {
+  //   setSettings(!settings);
+  // };
 
   return (
     <div className={`nav d-flex justify-content-between ${isSidebarOpen ? "sidebar-open" : ""}`}>
@@ -33,7 +38,7 @@ const Navbar = () => {
         </div>
       </div>
       <div className="circle me-5">
-        <button onClick={toggleSettings}>
+        <button onClick={navigateToLogin}>
           <img alt="Default pfp" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/256px-Default_pfp.svg.png" />
         </button>
       </div>
