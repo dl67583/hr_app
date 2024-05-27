@@ -26,6 +26,7 @@ module.exports = (sequelize) => {
       foreignKey: 'departmentId',
       as: 'Roles'
     });
+    
   };
 
   return Department;

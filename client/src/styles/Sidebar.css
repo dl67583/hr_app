@@ -1,54 +1,62 @@
 @import './variables.css';
 
 .sidebar {
-    background-color: var(--side-main);
-    width: 16.7%;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    z-index: 2;
+  background-color: var(--light-beige);
+  width: 16.7%;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  transition: transform 0.3s ease;
+  transform: translateX(-100%);
 }
 
-/* .collapsed {
-    background-color: lightgray;
-    width: 6.7%;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    z-index: 9999;
-} */
+.sidebar-open {
+  transform: translateX(0);
+}
 
 .side-logo {
-    background-color: var(--logo);
-    height: 6vh;
+  background-color: var(--light-beige);
+  height: 6vh;
 }
 
 .side-opt {
-    padding: 10px 0px 10px 30px;
+  padding: 10px 0px 10px 30px;
+  transition: 0.3s;
 
 }
 
 .side-opt a {
-    color: var(--logo);
-    text-decoration: none;
+  color: var(--logo);
+  text-decoration: none;
+}
+
+.side-opt:hover {
+  background-color: lightgray;
+  transition: 0.3s;
+}
+
+.selected-sidebar-link {
+  background-color: lightgray;
+  a{
+    color: var(--selected);
+    font-weight: bolder;
+  }
 }
 
 .selected {
-    color: var(--selected);
+  color: var(--selected);
 }
 
-/* .side-opt :hover {
-    background-color: #222b31;
-} */
-
 .logo {
-    color: white;
-    font-size: small;
-    font-weight: bold;
+  color: white;
+  font-size: small;
+  font-weight: bold;
 }
 
 @media only screen and (max-width: 768px) {
-    .sidebar {
-        display: none;
-    }
+  .sidebar {
+    display: none;
+  }
 }

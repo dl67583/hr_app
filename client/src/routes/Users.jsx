@@ -112,6 +112,7 @@ const Users = () => {
         token: null,
       });
       await axios.post(`http://localhost:3001/api/users`, createFormData);
+      await axios.post(`http://localhost:3001/api/users`, createFormData);
       closeCreatePopup();
       fetchUsers();
       navigate('/users');

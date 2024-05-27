@@ -61,12 +61,12 @@ module.exports = (sequelize) => {
   User.associate = (models) => {
     User.hasMany(models.TimeAttendance, {
       foreignKey: "userId",
-      onDelete: "NO ACTION",
+   
     });
 
     User.hasMany(models.Request, {
       foreignKey: "userId",
-      onDelete: "NO ACTION",
+   
     });
     User.belongsTo(models.Department, {
       foreignKey: "departmentId",
