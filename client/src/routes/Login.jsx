@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import "../styles/login.css";
 import { useNavigate } from 'react-router-dom';
 
@@ -11,11 +12,11 @@ const Login = () => {
     const handleLogin = async (event) => {
         event.preventDefault();
         try {
-          const response = await axios.post('/login', { username, password });
+          const response = await axios.post(`http://localhost:3001/api/login`, { username, password });
           localStorage.setItem('token', response.data.token);
           navigate('/users');
-        } catch (err) {
-          console.log('Authentication failed:', error);
+        } catch (error) {
+          console.error('Authentication failed:', error);
         }
       };
 
