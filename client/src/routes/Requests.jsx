@@ -178,14 +178,7 @@ const Requests = () => {
                                     />
                                 </div>
                                 <div className="row">
-                                    <input
-                                        type="userId"
-                                        name="userId"
-                                        placeholder="userId"
-                                        value={createFormData.userId}
-                                        onChange={handleChange}
 
-                                    />
                                     <select
                                         name="userId"
                                         id="userId"
