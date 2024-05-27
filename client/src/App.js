@@ -11,9 +11,11 @@ import Requests from "./routes/Requests";
 import Candidates from "./routes/Candidates";
 import Sidebar from "./components/Sidebar";
 import Login from "./routes/Login";
-
 import { SidebarProvider, useSidebar } from './context/sidebarContext';
 import "./styles/App.css";  // Import the CSS file for the app
+import ContactUs from "./routes/ContactUs";
+import AboutUs from "./routes/AboutUs";
+import FAQ from "./routes/FAQ";
 
 const AppContent = () => {
   const { isSidebarOpen } = useSidebar();
@@ -32,6 +34,9 @@ const AppContent = () => {
           <Route path="/candidates" element={<Candidates />} />
           <Route path="*" element={<NotFound />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/contactus" element={<ContactUs />} />
+          <Route path="/aboutus" element={<AboutUs />} />
+          <Route path="/faq" element={<FAQ />} />
         </Routes>
         <Footer />
       </div>
