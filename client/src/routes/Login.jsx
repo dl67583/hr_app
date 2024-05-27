@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import "../styles/login.css";
 import { useNavigate } from 'react-router-dom';
-
+import Swal from "sweetalert2";
 const Login = () => {
 
     const [username, setUsername] = useState('');
@@ -14,8 +14,21 @@ const Login = () => {
         try {
           const response = await axios.post(`http://localhost:3001/api/auth/login`, { username, password });
           localStorage.setItem('token', response.data.token);
+          Swal.fire({
+            title: 'Success!',
+            text: "Logged In " ,
+            icon: 'Success',
+            timer:2000,
+            confirmButtonText: 'Close'
+          })
           navigate('/users');
         } catch (error) {
+            Swal.fire({
+                title: 'Error!',
+                text: "Error deleting user: " +error.response.data.error,
+                icon: 'error',
+                confirmButtonText: 'Close'
+              })
           console.error('Authentication failed:', error);
         }
       };

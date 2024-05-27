@@ -34,11 +34,19 @@ const Navbar = () => {
 
     <div className={`nav d-flex justify-content-between ${isSidebarOpen ? "sidebar-open" : ""}`}>
       <button className="nav-menu col-2 d-flex align-items-center justify-content-center" onClick={toggleSidebar}>HR App</button>
-      <div className="nav-container col-10 d-flex align-items-center">
+      <div className="nav-container col-10 d-flex align-items-center justify-content-end">
         <div className="ms-5">
+        <div className='d-flex links'>
+            <a href="/">Home</a>
+            <a href="/contactus">Contact Us</a>
+            <a href="/faq">Contact Us</a>
+            <a href="/aboutus">Contact Us</a>
+        </div>
         </div>
       </div>
+
       <div className="circle me-5">
+       
         <button onClick={navigateToLogin}>
           <img alt="Default pfp" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/256px-Default_pfp.svg.png" />
         </button>

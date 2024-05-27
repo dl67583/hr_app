@@ -28,6 +28,13 @@ const Sidebar = () => {
 
           <a className={location.pathname === "/candidates" ? "selected" : ""} href="/candidates">Candidates</a>
         </div>
+
+
+        <div className={`side-opt ${location.pathname === "/attendance" ? "selected-sidebar-link" : ""}`} >
+
+<a className={location.pathname === "/attendance" ? "selected" : ""} href="/attendance">Time and Attendance</a>
+</div>
+
       </div>
       <hr style={{ color: 'white', margin: '10%' }} />
     </div>

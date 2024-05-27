@@ -44,4 +44,28 @@ router.post('/logout', authenticateJWT, async (req, res) => {
   }
 });
 
+router.post('/verify-token', async (req, res) => {
+  const token = req.header('Authorization').replace('Bearer ', '');
+
+  if (!token) {
+    return res.status(401).json({ message: 'No token provided.' });
+    console.log("no token")
+  }
+
+  try {
+    const decoded = jwt.verify(token, secret);
+    const user = await User.findByPk(decoded.userId);
+
+    if (!user || user.token !== token) {
+      return res.status(401).json({ message: 'Invalid token.' });
+      console.log("wrong token")
+    }
+    console.log("auth")
+    res.status(200).json({ valid: true });
+  } catch (error) {
+    res.status(401).json({ message: 'Invalid token.' });
+  }
+});
+
+
 module.exports = router;

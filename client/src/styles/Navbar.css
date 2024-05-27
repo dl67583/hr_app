@@ -26,6 +26,7 @@ background-color: transparent;
     border: none;
   text-decoration: none;
   background-color: var(--light-beige);
+  
 
 }
 
@@ -187,4 +188,30 @@ background-color: transparent;
   .navbar-container input[type="checkbox"]:checked ~ .logo {
     display: none;
   }
+}
+
+
+.links{
+    display: flex;
+
+    flex-direction: row;
+    justify-content: space-evenly;
+    margin-right: 100px;
+}
+
+.links a{
+    text-decoration: none;
+    color: var(--logo);
+    padding: 0 30px;
+    height: 6vh;
+    align-content: center;
+    transition: all 0.17s;
+
+}
+
+.links a:hover{
+    color: var(--selected);
+    background-color: lightgray;
+    transition: all 0.17s;
+
 }
