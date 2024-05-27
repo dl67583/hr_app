@@ -178,11 +178,6 @@ const Requests = () => {
                                     />
                                 </div>
                                 <div className="row">
-<<<<<<< HEAD
-
-=======
-                                   
->>>>>>> beee4dae0a06c52131c59bde81b47eda43b276b1
                                     <select
                                         name="userId"
                                         id="userId"
