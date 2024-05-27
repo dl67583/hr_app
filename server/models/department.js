@@ -26,7 +26,10 @@ module.exports = (sequelize) => {
       foreignKey: 'departmentId',
       as: 'Roles'
     });
-    
+    Department.hasMany(models.User,{
+      foreignKey: 'departmentId',
+      
+    })
   };
 
   return Department;

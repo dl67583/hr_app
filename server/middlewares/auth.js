@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { User, Role, RolePermission } = require('../models');
-const secret = process.env.JWT_SECRET;
+const secret = "test";
 
 const authenticateJWT = (req, res, next) => {
   const token = req.header('Authorization').replace('Bearer ', '');

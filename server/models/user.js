@@ -52,7 +52,7 @@ module.exports = (sequelize) => {
       indexes: [
         {
           unique: true,
-          fields: ["email"],
+          fields: ["email", "username"],
         },
       ],
     }

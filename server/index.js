@@ -29,7 +29,7 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/requests', requestRoutes);
 app.use('/api/timeAttendance', timeAttendanceRoutes);
-app.use('/api/login', authRoutes);
+app.use('/api/auth', authRoutes);
 
 
 db.sequelize.sync({alter:true}).then(() => {

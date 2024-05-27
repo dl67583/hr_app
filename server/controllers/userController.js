@@ -20,8 +20,8 @@ exports.createUser = async (req, res) => {
       password: hashedPassword,
       birthday,
       hourlyPay,
+      token,
       departmentId,
-      token
     });
 
     // Create entry in the UserRole table
@@ -34,7 +34,12 @@ exports.createUser = async (req, res) => {
 
     res.status(201).json(newUser);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      const field = error.errors[0].path;
+      res.status(400).json({ error: `${field} must be unique` });
+    } else {
+      res.status(400).json({ error: error.message });
+    }
   }
 };
 
@@ -90,7 +95,12 @@ exports.updateUser = async (req, res) => {
 
     res.status(200).json(updatedUser);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      const field = error.errors[0].path;
+      res.status(400).json({ error: `${field} must be unique` });
+    } else {
+      res.status(400).json({ error: error.message });
+    }
   }
 };
 
