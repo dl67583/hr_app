@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-
+import "../styles/Navbar.css"
 const Navbar = () => {
 
   const [scroll, setScroll] = useState(false);

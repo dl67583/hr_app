@@ -11,6 +11,10 @@ import Attendance from "./routes/Attendance";
 import Meetings from "./routes/Meetings";
 import Requests from "./routes/Requests";
 import Candidates from "./routes/Candidates";
+import ContactUs from "./routes/ContactUs";
+import AboutUs from "./routes/AboutUs";
+
+
 const App = () => {
   return (
     <>
@@ -25,6 +29,9 @@ const App = () => {
             <Route path="/requests" element={<Requests />} />
             <Route path="/meetings" element={<Meetings />} />
             <Route path="/candidates" element={<Candidates />} />
+            <Route path="/contact-us" element={<ContactUs />} />
+            <Route path="/about-us" element={<AboutUs />} />
+
           </Routes>
         </div>
         <div className="space"></div>
