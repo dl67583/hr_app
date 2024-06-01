@@ -70,6 +70,7 @@ module.exports = (sequelize) => {
     });
     User.belongsTo(models.Department, {
       foreignKey: "departmentId",
+      allowNull: "true",
     });
     User.belongsToMany(models.Role, {
       as: "UserRoles",

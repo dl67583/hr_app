@@ -30,6 +30,10 @@ module.exports = (sequelize) => {
       as: 'users',
       onDelete:"NO ACTION"
     });
+    Department.belongsTo(models.User, {
+      foreignKey: 'departmentHead',
+      as: 'head',
+    });
   };
 
   return Department;
