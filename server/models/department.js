@@ -16,20 +16,20 @@ module.exports = (sequelize) => {
   });
 
   Department.associate = (models) => {
-    Department.belongsToMany(models.Project, {
-      through: models.DepartmentProject,
+    Department.hasMany(models.Project, {
       foreignKey: 'departmentId',
-      as: 'Projects'
+      as: 'projects',
     });
     Department.belongsToMany(models.Role, {
       through: models.RolePermission,
       foreignKey: 'departmentId',
-      as: 'Roles'
+      as: 'Roles',
     });
-    Department.hasMany(models.User,{
+    Department.hasMany(models.User, {
       foreignKey: 'departmentId',
-      
-    })
+      as: 'users',
+      onDelete:"NO ACTION"
+    });
   };
 
   return Department;

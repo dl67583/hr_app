@@ -3,7 +3,7 @@
 .sidebar {
   background-color: var(--light-beige);
   width: 16.7%;
-  height: 100vh;
+  height: 100%;
   position: fixed;
   top: 0;
   left: 0;

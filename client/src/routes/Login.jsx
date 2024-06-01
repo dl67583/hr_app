@@ -17,17 +17,19 @@ const Login = () => {
           Swal.fire({
             title: 'Success!',
             text: "Logged In " ,
-            icon: 'Success',
-            timer:2000,
-            confirmButtonText: 'Close'
+            icon: 'success',
+            timer:1500,
+            showConfirmButton:false
+       
           })
           navigate('/users');
-        } catch (error) {
+        } catch (error) {    
             Swal.fire({
                 title: 'Error!',
-                text: "Error deleting user: " +error.response.data.error,
+                text: "Error logging in: " +error.response.data.error,
                 icon: 'error',
-                confirmButtonText: 'Close'
+                timer:1500,
+                showConfirmButton:false
               })
           console.error('Authentication failed:', error);
         }
