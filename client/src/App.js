@@ -16,7 +16,8 @@ import "./styles/App.css";  // Import the CSS file for the app
 import ContactUs from "./routes/ContactUs";
 import AboutUs from "./routes/AboutUs";
 import FAQ from "./routes/FAQ";
-
+import Dashboard from "./routes/Dashboard";
+import AdminDashboard from "./routes/AdminDashboard";
 const AppContent = () => {
   const { isSidebarOpen } = useSidebar();
 
@@ -37,6 +38,8 @@ const AppContent = () => {
           <Route path="/contactus" element={<ContactUs />} />
           <Route path="/aboutus" element={<AboutUs />} />
           <Route path="/faq" element={<FAQ />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admindashboard" element={<AdminDashboard />} />
         </Routes>
         <Footer />
       </div>
