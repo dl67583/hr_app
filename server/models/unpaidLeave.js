@@ -13,6 +13,11 @@ module.exports = (sequelize) => {
       allowNull: false,
       unique: true,
     },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      foreignKey: true,
+    },
   });
 
   UnpaidLeave.associate = (models) => {
