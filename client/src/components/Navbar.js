@@ -40,8 +40,8 @@ const Navbar = () => {
           <div className='d-flex links'>
             <a href="/">Home</a>
             <a href="/contactus">Contact Us</a>
-            <a href="/faq">Contact Us</a>
-            <a href="/aboutus">Contact Us</a>
+            <a href="/faq">FAQ</a>
+            <a href="/aboutus">About Us</a>
           </div>
         </div>
       </div>

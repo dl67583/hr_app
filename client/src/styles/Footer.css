@@ -5,7 +5,7 @@
     left: 0;
     background-color: #001b24;
     color: #fff;
-    padding: 20px;
+    padding: 20px 0;
     z-index: 999;
   }
   
@@ -19,15 +19,15 @@
   }
   
   .footer p {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 30px;
+    margin: 0;
+    line-height: 1.5;
   }
   
   .footer-menu {
     list-style: none;
     display: flex;
+    align-items: center;
+    margin: 0;
   }
   
   .footer-menu li {
