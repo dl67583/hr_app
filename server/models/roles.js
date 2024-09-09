@@ -9,27 +9,28 @@ module.exports = (sequelize) => {
       autoIncrement: true,
     },
     name: {
-      type: DataTypes.ENUM,
-      values: ['regular', 'hr', 'superadmin'],
+      type: DataTypes.ENUM('regular', 'hr', 'superadmin'), 
       allowNull: false,
     },
+  }, {
+   timestamps: false, // Disable timestamps
   });
 
   Role.associate = (models) => {
     Role.belongsToMany(models.User, {
       through: models.UserRole,
-      foreignKey: 'roleId',
-      as: 'Users'
+      foreignKey: 'roleId', 
+      as: 'Users',
     });
     Role.belongsToMany(models.Project, {
       through: models.RolePermission,
       foreignKey: 'roleId',
-      as: 'Projects'
+      as: 'Projects',
     });
     Role.belongsToMany(models.Department, {
       through: models.RolePermission,
       foreignKey: 'roleId',
-      as: 'Departments'
+      as: 'Departments',
     });
   };
 

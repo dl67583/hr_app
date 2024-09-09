@@ -1,94 +1,52 @@
+// middlewares/auth.js
 const jwt = require('jsonwebtoken');
-const { User, Role, RolePermission } = require('../models');
-const secret = "test";
+const { RolePermission } = require('../models');
 
 const authenticateJWT = (req, res, next) => {
-  const token = req.header('Authorization').replace('Bearer ', '');
+  const token = req.headers.authorization?.split(' ')[1];
 
   if (!token) {
-    return res.status(401).json({ message: 'Access denied. No token provided.' });
+    return res.status(403).send('Access Denied. No token provided.');
   }
 
   try {
-    const decoded = jwt.verify(token, secret);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
     next();
   } catch (error) {
-    res.status(400).json({ message: 'Invalid token.' });
+    return res.status(403).send('Invalid Token.');
   }
 };
 
-const checkPermissions = (requiredPermissions) => {
+// Checking permissions
+const checkPermissions = (requiredPermission, projectId = null, departmentId = null) => {
   return async (req, res, next) => {
+    const { roleId } = req.user; // Assuming roleId is included in the JWT payload
+
     try {
-      const userId = req.user.userId;
-      const { projectId, departmentId } = req.params;
-
-      const user = await User.findByPk(userId, {
-        include: [{
-          model: Role,
-          as: 'UserRoles'
-        }]
-      });
-
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-
-      const roleIds = user.UserRoles.map(role => role.id);
-      const rolePermissions = await RolePermission.findAll({
+      // Query permissions for the user’s role, potentially restricted to project or department
+      const queryOptions = {
         where: {
-          roleId: roleIds,
-          permission: requiredPermissions,
-          projectId: projectId || null,
-          departmentId: departmentId || null
+          roleId,
+          permission: requiredPermission
         }
-      });
+      };
+      
+      // Apply project or department constraints if applicable
+      if (projectId) queryOptions.where.projectId = projectId;
+      if (departmentId) queryOptions.where.departmentId = departmentId;
 
-      const hasPermission = rolePermissions.length > 0;
+      const permissions = await RolePermission.findOne(queryOptions);
 
-      if (!hasPermission) {
-        return res.status(403).json({ message: 'Access denied' });
+      if (!permissions) {
+        return res.status(403).send('You do not have the required permissions.');
       }
-
-      req.allowedColumns = rolePermissions.reduce((acc, rp) => {
-        if (rp.columns) {
-          Object.keys(rp.columns).forEach(column => {
-            if (!acc[column]) {
-              acc[column] = rp.columns[column];
-            } else {
-              acc[column] = acc[column] || rp.columns[column];
-            }
-          });
-        }
-        return acc;
-      }, {});
 
       next();
     } catch (error) {
-      res.status(500).json({ message: 'Server error', error: error.message });
+      return res.status(500).send('Error checking permissions.');
     }
   };
 };
 
-const generateToken = async (user) => {
-  const token = jwt.sign({ userId: user.id, email: user.email }, secret, { expiresIn: '1h' });
-  user.token = token;
-  await user.save();
-  return token;
-};
-
-const removeToken = async (userId) => {
-  const user = await User.findByPk(userId);
-  if (user) {
-    user.token = null;
-    await user.save();
-  }
-};
-
-module.exports = {
-  authenticateJWT,
-  checkPermissions,
-  generateToken,
-  removeToken
-};
+module.exports = { authenticateJWT, checkPermissions };

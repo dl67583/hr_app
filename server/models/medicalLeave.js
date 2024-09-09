@@ -17,6 +17,7 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
       allowNull: false,
       foreignKey: true,
+      field: 'userId',
     },
   });
 

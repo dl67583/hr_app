@@ -14,6 +14,7 @@ module.exports = (sequelize) => {
     },
     departmentId: {
       type: DataTypes.INTEGER,
+      field: 'departmentId',
       allowNull: false,
       references: {
         model: 'Departments',
@@ -26,8 +27,7 @@ module.exports = (sequelize) => {
     Project.belongsTo(models.Department, {
       foreignKey: 'departmentId',
       as: 'department',
-      onDelete:"NO ACTION"
-
+      onDelete: "NO ACTION"
     });
     Project.belongsToMany(models.Role, {
       through: models.RolePermission,

@@ -54,28 +54,25 @@ module.exports = (sequelize) => {
           unique: true,
           fields: ["email", "username"],
         },
-      ],
-    }
+      ],    }
   );
 
   User.associate = (models) => {
     User.hasMany(models.TimeAttendance, {
-      foreignKey: "userId",
-   
+      foreignKey: "userId", // Match snake_case convention
     });
 
     User.hasMany(models.Request, {
       foreignKey: "userId",
-   
     });
     User.belongsTo(models.Department, {
-      foreignKey: "departmentId",
-      allowNull: "true",
+      foreignKey: "departmentId", 
+      allowNull: true,
     });
     User.belongsToMany(models.Role, {
       as: "UserRoles",
       through: models.UserRole,
-      foreignKey: "userId",
+      foreignKey: "userId", // Matches the snake_case column in UserRole
     });
   };
 

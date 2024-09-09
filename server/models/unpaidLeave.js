@@ -16,13 +16,13 @@ module.exports = (sequelize) => {
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      foreignKey: true,
+      field: 'userId', // Maps to userId in the database
     },
   });
 
   UnpaidLeave.associate = (models) => {
     UnpaidLeave.belongsTo(models.User, {
-      foreignKey: 'userId',
+      foreignKey: 'userId', 
       as: 'user',
     });
     UnpaidLeave.belongsTo(models.Department, {
