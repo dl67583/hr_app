@@ -1,8 +1,9 @@
+// Navbar.js
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSidebar } from '../context/sidebarContext';
 import { AuthContext } from '../context/AuthContext';
-import axios from 'axios'; // Import axios
+import axios from 'axios';
 import "../styles/Navbar.css";
 
 const Navbar = () => {
@@ -10,7 +11,7 @@ const Navbar = () => {
   const { isSidebarOpen } = useSidebar();
   const [scroll, setScroll] = useState(false);
   const nav = useNavigate();
-  const { isAuthenticated, logout } = useContext(AuthContext);
+  const { isAuthenticated, logout, loading } = useContext(AuthContext);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,6 +32,10 @@ const Navbar = () => {
       console.error('Logout failed', error);
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>; // Render loading state while checking token
+  }
 
   return (
     <div className={`nav d-flex justify-content-between ${isSidebarOpen ? "sidebar-open" : ""}`}>
