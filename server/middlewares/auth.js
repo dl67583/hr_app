@@ -1,6 +1,21 @@
 // middlewares/auth.js
 const jwt = require('jsonwebtoken');
 const { RolePermission } = require('../models');
+const secret = "secret"
+
+const generateToken = (user) => {
+  const payload = {
+    id: user.id,
+    roleId: user.roleId,
+    username: user.username, 
+  };
+
+  const token = jwt.sign(payload, secret, {
+    expiresIn: '1h',
+  });
+
+  return token;
+};
 
 const authenticateJWT = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
@@ -10,7 +25,7 @@ const authenticateJWT = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, secret);
     req.user = decoded;
     next();
   } catch (error) {
@@ -49,4 +64,4 @@ const checkPermissions = (requiredPermission, projectId = null, departmentId = n
   };
 };
 
-module.exports = { authenticateJWT, checkPermissions };
+module.exports = { authenticateJWT, checkPermissions, generateToken };

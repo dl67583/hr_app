@@ -27,8 +27,10 @@ const ProtectedRoute = ({ children, requiredPermission }) => {
 
   // If the user is not authenticated, redirect to login
   if (!isAuthenticated) {
+    console.log(isAuthenticated)
     return <Navigate to="/login" />;
   }
+  
 
   // If a required permission is specified, ensure the user has it
   if (requiredPermission && !permissions.includes(requiredPermission)) {
