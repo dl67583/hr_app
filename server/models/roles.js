@@ -32,6 +32,10 @@ module.exports = (sequelize) => {
       foreignKey: 'roleId',
       as: 'Departments',
     });
+    Role.hasMany(models.RolePermission, {
+      foreignKey: 'roleId',
+      as: 'Permissions',
+    });
   };
 
   return Role;

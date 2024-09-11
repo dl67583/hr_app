@@ -5,6 +5,7 @@ module.exports = {
     // Step 1: Hash passwords
     const hashedPasswordJohn = await bcrypt.hash('passwordForJohn', 10);
     const hashedPasswordJane = await bcrypt.hash('passwordForJane', 10);
+    const hashedPasswordSuperAdmin = await bcrypt.hash('12345678', 10); // Superadmin password
 
     // Step 2: Seed Roles
     await queryInterface.bulkInsert('Roles', [
@@ -46,6 +47,17 @@ module.exports = {
         hourlyPay: 22.0,
         departmentId: 2, // Assign to HR
       },
+      {
+        name: 'Super',
+        surname: 'Admin',
+        username: 'superadmin',
+        email: 'super.admin@example.com',
+        phone: '1112223333',
+        password: hashedPasswordSuperAdmin, // Superadmin password
+        birthday: '1985-01-01',
+        hourlyPay: 50.0,
+        departmentId: 1, // Assign to Finance (or any department)
+      },
     ]);
 
     // Step 5: Update departmentHead in Departments
@@ -62,6 +74,7 @@ module.exports = {
     await queryInterface.bulkInsert('UserRoles', [
       { userId: 1, roleId: 1 }, // John -> regular role
       { userId: 2, roleId: 2 }, // Jane -> hr role
+      { userId: 3, roleId: 3 }, // Superadmin -> superadmin role
     ]);
 
     // Step 8: Seed Role Permissions
@@ -182,6 +195,7 @@ module.exports = {
         timeOfLeaving: '17:00:00',
       },
     ]);
+
     await queryInterface.bulkInsert('ProjectRoleAssignments', [
       { userId: 1, projectId: 1, roleId: 6 }, // John is Project Manager for Project Alpha
       { userId: 2, projectId: 1, roleId: 1 }, // Jane is Regular User for Project Alpha

@@ -42,11 +42,7 @@ module.exports = (sequelize) => {
       hourlyPay: {
         type: DataTypes.FLOAT,
         allowNull: true,
-      },
-      token: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
+      }
     },
     {
       indexes: [

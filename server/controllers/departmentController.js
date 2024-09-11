@@ -1,52 +1,61 @@
-const { Department, RolePermission } = require('../models');
+const { Department } = require('../models');
 
-module.exports = {
-  async getAllDepartments(req, res) {
+const departmentController = {
+  create: async (req, res) => {
+    try {
+      const department = await Department.create(req.body);
+      res.status(201).json(department);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  },
+
+  getAll: async (req, res) => {
     try {
       const departments = await Department.findAll();
       res.status(200).json(departments);
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(400).json({ error: error.message });
     }
   },
 
-  async createDepartment(req, res) {
+  getById: async (req, res) => {
     try {
-      const { name } = req.body;
-      const department = await Department.create({ name });
-      res.status(201).json(department);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  },
-
-  async updateDepartment(req, res) {
-    try {
-      const { id } = req.params;
-      const { name } = req.body;
-      const department = await Department.findByPk(id);
+      const department = await Department.findByPk(req.params.id);
       if (!department) {
-        return res.status(404).json({ message: 'Department not found' });
+        return res.status(404).json({ error: 'Department not found' });
       }
-      department.name = name;
-      await department.save();
       res.status(200).json(department);
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(400).json({ error: error.message });
     }
   },
 
-  async deleteDepartment(req, res) {
+  update: async (req, res) => {
     try {
-      const { id } = req.params;
-      const department = await Department.findByPk(id);
+      const department = await Department.findByPk(req.params.id);
       if (!department) {
-        return res.status(404).json({ message: 'Department not found' });
+        return res.status(404).json({ error: 'Department not found' });
+      }
+      await department.update(req.body);
+      res.status(200).json(department);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  },
+
+  delete: async (req, res) => {
+    try {
+      const department = await Department.findByPk(req.params.id);
+      if (!department) {
+        return res.status(404).json({ error: 'Department not found' });
       }
       await department.destroy();
-      res.status(200).json({ message: 'Department deleted successfully' });
+      res.status(204).send();
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(400).json({ error: error.message });
     }
-  }
+  },
 };
+
+module.exports = departmentController;
