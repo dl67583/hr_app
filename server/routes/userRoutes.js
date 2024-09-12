@@ -7,9 +7,9 @@ const { authenticateJWT, checkPermissions } = require('../middlewares/auth');
 // router.post('/users/register', userController.createUser);
 
 // Protected routes with role and permission checks
-router.get('', userController.getAllUsers);
-router.post('', userController.createUser);
-router.put('/:id', userController.updateUser);
-router.delete('/:id', userController.deleteUser);
+router.get('/users', userController.getAll);
+router.post('/users', userController.create);
+router.put('/users/:id', userController.update);
+router.delete('/users/:id', userController.delete);
 
 module.exports = router;

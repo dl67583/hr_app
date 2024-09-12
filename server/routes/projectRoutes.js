@@ -4,11 +4,11 @@ const projectController = require('../controllers/projectController');
 const { authenticateJWT, checkPermissions } = require('../middlewares/auth');
 
 // Public routes
-router.get('/', projectController.getAllProjects);
+router.get('/', projectController.getAll);
 
 // Protected routes with role and permission checks
-router.post('/', projectController.createProject);
-router.put('/:id', projectController.updateProject);
-router.delete('/:id',  projectController.deleteProject);
+router.post('/', projectController.create);
+router.put('/:id', projectController.update);
+router.delete('/:id',  projectController.delete);
 
 module.exports = router;

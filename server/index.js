@@ -2,12 +2,12 @@ const express = require('express');
 const db = require('./models');
 const userRoutes = require('./routes/userRoutes');
 const departmentRoutes = require('./routes/departmentRoutes');
-const candidateRoutes = require('./routes/candidateRoutes');
+// const candidateRoutes = require('./routes/candidateRoutes');
 const roleRoutes = require('./routes/roleRoutes');
 const projectRoutes = require('./routes/projectRoutes');
-const paymentRoutes = require('./routes/paymentRoutes');
+// const paymentRoutes = require('./routes/paymentRoutes');
 const requestRoutes = require('./routes/requestRoutes');
-const timeAttendanceRoutes = require('./routes/timeAttendanceRoutes');
+// const timeAttendanceRoutes = require('./routes/timeAttendanceRoutes');
 const authRoutes = require('./routes/authRoutes');
 const schedulePayments = require('./schedulers/paymentScheduler');
 const path = require('path');
@@ -28,31 +28,26 @@ app.use(express.json());
 // Use the routes for the various API endpoints
 app.use('/api/users', userRoutes);
 app.use('/api/departments', departmentRoutes);
-app.use('/api/candidates', candidateRoutes);
+// app.use('/api/candidates', candidateRoutes);
 app.use('/api/roles', roleRoutes);
 app.use('/api/projects', projectRoutes);
-app.use('/api/payments', paymentRoutes);
+// app.use('/api/payments', paymentRoutes);
 app.use('/api/requests', requestRoutes);
-app.use('/api/timeAttendance', timeAttendanceRoutes);
+// app.use('/api/timeAttendance', timeAttendanceRoutes);
 app.use('/api/auth', authRoutes);
 
-// Sync the database (if using Sequelize)
 db.sequelize.sync({ alter: true }).then(() => {
   console.log('Database synced');
 
-  // Start the Express server on the specified port
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
 
-  // Run scheduled payments (e.g., using a cron job)
   schedulePayments();
 });
 
-// Serve the frontend if in production or if frontend build files are present
 app.use(express.static(path.join(__dirname, '../client/build')));
 
-// If no other routes match, send back the index.html (React app entry point)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
