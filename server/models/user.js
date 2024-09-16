@@ -66,9 +66,9 @@ module.exports = (sequelize) => {
       allowNull: true,
     });
     User.belongsToMany(models.Role, {
-      as: "UserRoles",
-      through: models.UserRole,
-      foreignKey: "userId", // Matches the snake_case column in UserRole
+      through: 'UserRole',  // Join table
+      foreignKey: 'userId',
+      as: 'Roles',  // Alias to be used when fetching roles
     });
   };
 

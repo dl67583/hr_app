@@ -1,15 +1,21 @@
-// departmentRoutes.js
 const express = require('express');
-const router = express.Router();
+const { checkPermission } = require('../middlewares/permission');
 const departmentController = require('../controllers/departmentController');
-const { authenticateJWT, checkPermissions } = require('../middlewares/auth');
+const router = express.Router();
 
-// Public route to get all departments
-router.get('/', departmentController.getAll);
+// Get all departments (accessible by admin or HR)
+router.get('/', checkPermission('read', 'team', 'Department'), departmentController.getAll);
 
-// Protected routes with role and permission checks
-router.post('/', authenticateJWT, checkPermissions('write'), departmentController.create);
-router.put('/:id', authenticateJWT, checkPermissions('update'), departmentController.update);
-router.delete('/:id', authenticateJWT, checkPermissions('delete'), departmentController.delete);
+// Get a specific department (accessible by admin or HR)
+router.get('/:id', checkPermission('read', 'team', 'Department'), departmentController.getById);
+
+// Create a new department (accessible by admin)
+router.post('/', checkPermission('write', 'team', 'Department'), departmentController.create);
+
+// Update a department (accessible by admin)
+router.put('/:id', checkPermission('write', 'team', 'Department'), departmentController.update);
+
+// Delete a department (accessible by admin)
+router.delete('/:id', checkPermission('write', 'team', 'Department'), departmentController.deleteDepartment);
 
 module.exports = router;

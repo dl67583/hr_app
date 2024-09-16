@@ -7,11 +7,10 @@ const generateToken = async (user) => {
    const payload = {
      id: user.id,
      username: user.username,
-     // Add other necessary fields to the token payload
+     roleId: user.roleId,  // Add roleId to the token payload
    };
    return jwt.sign(payload, secret, { expiresIn: '1h' });
  };
- 
 module.exports = { generateToken };
 
  
@@ -33,33 +32,26 @@ const authenticateJWT = (req, res, next) => {
    }
  };
  
- const checkPermissions = (requiredPermission, projectId = null, departmentId = null) => {
+ const checkPermissions = (requiredPermission, scope, projectId = null, departmentId = null) => {
    return async (req, res, next) => {
-     const { roleId } = req.user; // Assuming roleId is included in the JWT payload
+     const { roleId } = req.user;
  
-     try {
-       const queryOptions = {
-         where: {
-           roleId,
-           permissionType: requiredPermission // Ensure this matches the permission type
-         }
-       };
- 
-       // Add optional scoping for project or department
-       if (projectId) queryOptions.where.projectId = projectId;
-       if (departmentId) queryOptions.where.departmentId = departmentId;
- 
-       const permission = await RolePermission.findOne(queryOptions);
- 
-       if (!permission) {
-         return res.status(403).json({ message: 'You do not have the required permissions.' });
+     const queryOptions = {
+       where: {
+         roleId,
+         permissionType: requiredPermission,
+         scope: scope  // Check scope as well
        }
+     };
  
-       next();
-     } catch (error) {
-       console.error('Error checking permissions:', error);
-       return res.status(500).json({ message: 'Error checking permissions.', error: error.message });
+     if (projectId) queryOptions.where.projectId = projectId;
+     if (departmentId) queryOptions.where.departmentId = departmentId;
+ 
+     const permission = await RolePermission.findOne(queryOptions);
+     if (!permission) {
+       return res.status(403).json({ message: 'You do not have the required permissions.' });
      }
+     next();
    };
  };
  

@@ -1,15 +1,21 @@
 const express = require('express');
-const router = express.Router();
+const { checkPermission } = require('../middlewares/permission');
 const userController = require('../controllers/userController');
-const { authenticateJWT, checkPermissions } = require('../middlewares/auth');
+const router = express.Router();
 
-// Public routes (if any)
-// router.post('/users/register', userController.createUser);
+// Get all users in a department (department head or team access)
+router.get('/department/:departmentId', checkPermission('read', 'department', 'User'), userController.getByDepartment);
 
-// Protected routes with role and permission checks
-router.get('/users', userController.getAll);
-router.post('/users', userController.create);
-router.put('/users/:id', userController.update);
-router.delete('/users/:id', userController.delete);
+// Get a specific user
+router.get('/:id', checkPermission('read', 'individual', 'User'), userController.getById);
+
+// Create a new user
+router.post('/', checkPermission('write', 'team', 'User'), userController.create);
+
+// Update a user
+router.put('/:id', checkPermission('write', 'individual', 'User'), userController.update);
+
+// Delete a user
+router.delete('/:id', checkPermission('write', 'team', 'User'), userController.deleteUser);
 
 module.exports = router;

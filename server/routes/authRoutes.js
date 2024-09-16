@@ -7,12 +7,24 @@ const { authenticateJWT, generateToken, removeToken } = require('../middlewares/
 const secret = `secret`;
 
 // User login
+// authRoutes.js
+// authRoutes.js
 router.post('/login', async (req, res) => {
    const { username, password } = req.body;
  
    try {
-     // Fetch user by username
-     const user = await User.findOne({ where: { username } });
+     // Fetch user with roles
+     const user = await User.findOne({
+       where: { username },
+       include: [
+         {
+           model: Role,  // Include roles in the user query
+           as: 'Roles',
+           through: { attributes: [] },  // Exclude join table attributes
+         },
+       ],
+     });
+ 
      if (!user) {
        return res.status(401).json({ error: 'User not found' });
      }
@@ -26,14 +38,22 @@ router.post('/login', async (req, res) => {
      // Generate JWT Token
      const token = jwt.sign({ id: user.id }, secret, { expiresIn: '1h' });
  
-     res.status(200).json({ token });
+     // Return token and user details including roles
+     res.status(200).json({
+       token,
+       user: {
+         id: user.id,
+         username: user.username,
+         email: user.email,
+         roles: user.Roles.map(role => role.name),  // Include role names
+       },
+     });
    } catch (error) {
      console.error('Login error:', error);
      res.status(500).json({ error: 'An error occurred during login.' });
    }
  });
  
-
 router.post('/logout', authenticateJWT, async (req, res) => {
    try {
      const user = await User.findByPk(req.user.id);
