@@ -1,39 +1,17 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import "./index.css";
-import "./styles/Navbar.css"
-import "./styles/Footer.css"
-import App from "./App";
-import { AuthProvider } from './context/AuthContext';
-import reportWebVitals from "./reportWebVitals";
+// In your index.js or where you render your React app
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import App from './App';
+import { AuthProvider } from './context/AuthContext';  // Ensure correct path
 
-// const router = createBrowserRouter([
-//   {
-//     path: "/users",
-//     element: <Users />,
-//   },
-//   {
-//     path: "/departments",
-//     element: <Departments />,
-//   },
-//   // {
-//   //   path: "/users:id",
-//   //   element: <UserDetails />,
-//   // },
-//   // {
-//   //   path: "/",
-//   //   element: <Home />,
-//   //   errorElement:<NotFound/>
-//   // },
-// ]);
-
-ReactDOM.render(
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
   <React.StrictMode>
-    <AuthProvider>
-      <App />
-    </AuthProvider>
-  </React.StrictMode>,
-  document.getElementById("root")
+    <BrowserRouter>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </BrowserRouter>
+  </React.StrictMode>
 );
-
-reportWebVitals();
