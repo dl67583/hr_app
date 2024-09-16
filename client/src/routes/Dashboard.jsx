@@ -1,23 +1,16 @@
 import React from 'react';
-import axios from 'axios';
-import "../styles/dashboard.css";
-import Card from '../components/Card';
+import { useAuth } from '../context/AuthContext';
 
 const Dashboard = () => {
+  const { user, logout } = useAuth();
 
-    return (
-        <div className="container">
-
-            <div className="row mt-4 mb-5 row-cols-3 justify-content-center align-items-center">
-                <Card />
-                <Card />
-                <Card />
-                <Card />
-            </div>
-            </div>
-        
-    )
-
-}
+  return (
+    <div>
+      <h1>Welcome, {user.username}</h1>
+      <button onClick={logout}>Logout</button>
+      {/* Implement other dashboard features as needed */}
+    </div>
+  );
+};
 
 export default Dashboard;
