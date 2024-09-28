@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSidebar } from '../context/sidebarContext';
-import { AuthContext } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import "../styles/Navbar.css";
 
@@ -11,7 +11,7 @@ const Navbar = () => {
   const { isSidebarOpen } = useSidebar();
   const [scroll, setScroll] = useState(false);
   const nav = useNavigate();
-  const { isAuthenticated, logout, loading } = useContext(AuthContext);
+  const { isAuthenticated, logout, loading } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {

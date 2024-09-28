@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import "../styles/login.css";
 import { useAuth } from '../context/AuthContext';  // Ensure the path is correct
 
 const Login = () => {
@@ -19,20 +20,26 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <input
-        type="text"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        placeholder="Username"
-      />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-      />
-      <button onClick={handleLogin}>Login</button>
+    <div className='login-container'>
+      <div className='input'>
+        <input
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Username"
+        />
+      </div>
+      <div className='input'>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+        />
+      </div>
+      <div className='login-btn'>
+        <button onClick={handleLogin}>Login</button>
+      </div>
     </div>
   );
 };

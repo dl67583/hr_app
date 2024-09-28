@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import '../styles/crud.css';
 import Swal from 'sweetalert2'
+import { useAuth } from "../context/AuthContext";
 
 
 const Users = () => {
@@ -12,6 +13,7 @@ const Users = () => {
   const [editUser, setEditUser] = useState(null);
   const [createUsers, setCreateUsers] = useState(null)
   const [projects, setProjects] = useState([])
+  const user = useAuth();
   const navigate = useNavigate()
 
   const [createFormData, setCreateFormData] = useState({
@@ -205,7 +207,7 @@ const Users = () => {
 
   return (
     <div>
-
+      <p>Welcome, {user.username}</p>
 
       <div className="container">
         <table className="table table-bordered users-tbl">
