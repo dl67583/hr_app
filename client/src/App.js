@@ -33,11 +33,13 @@ const AppContent = () => {
           <>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/users" element={<Users />} />
+
             {/* <Route path="*" element={<Dashboard />} />   Fallback to dashboard if authenticated */}
           </>
         ) : (
           <>
             <Route path="/" element={<Login />} />
+
             {/* <Route path="*" element={<Login />} />  //Fallback to login if not authenticated */}
           </>
         )}

@@ -1,19 +1,13 @@
-import React, { useContext } from 'react';
+import { useAuth } from './context/AuthContext';
 import { Navigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
 
-const ProtectedRoute = ({ children, requiredPermission }) => {
-  const { isAuthenticated, permissions } = useContext(AuthContext);
+const ProtectedRoute = ({ children, permissionType, resource }) => {
+  const { user } = useAuth();
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" />;
-  }
-
-  if (requiredPermission && !permissions.includes(requiredPermission)) {
-    return <Navigate to="/unauthorized" />;
+  // Assuming `user.roles` contains the user’s roles and permissions
+  if (!user || !user.roles.includes(permissionType)) {
+    return <Navigate to="/" replace />;
   }
 
   return children;
 };
-
-export default ProtectedRoute;

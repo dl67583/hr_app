@@ -21,6 +21,7 @@ module.exports = (sequelize) => {
       username: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true,
       },
       email: {
         type: DataTypes.STRING,
@@ -41,38 +42,39 @@ module.exports = (sequelize) => {
       },
       hourlyPay: {
         type: DataTypes.TEXT,
-        refreshToken: {
-         type: DataTypes.TEXT,
-         allowNull: true,
-       },
+      },
+      refreshToken: {
+        type: DataTypes.TEXT,  // Ensure refresh token field exists
+        allowNull: true,
+      },
     },
-   },
     {
       indexes: [
         {
           unique: true,
           fields: ["email", "username"],
         },
-      ],    }
+      ],
+    }
   );
 
   User.associate = (models) => {
     User.hasMany(models.TimeAttendance, {
-      foreignKey: "userId", // Match snake_case convention
+      foreignKey: "userId",
     });
-
     User.hasMany(models.Request, {
       foreignKey: "userId",
     });
     User.belongsTo(models.Department, {
-      foreignKey: "departmentId", 
+      foreignKey: "departmentId",
       allowNull: true,
     });
-    User.belongsToMany(models.Role, {
-      through: 'UserRole',  // Join table
-      foreignKey: 'userId',
-      as: 'Roles',  // Alias to be used when fetching roles
+    User.belongsTo(models.Role, {
+      foreignKey: "roleId",  // You can store the roleId directly in the User model
+      as: "Role",
     });
+    
+    
   };
 
   return User;
