@@ -1,13 +1,13 @@
-// roleRoutes.js
 const express = require('express');
-const router = express.Router();
 const roleController = require('../controllers/roleController');
-const { authenticateJWT, checkPermissions } = require('../middlewares/auth');
+const { checkPermissions, authenticateJWT } = require('../middlewares/auth');
+const router = express.Router();
 
-// Protected routes with role and permission checks
-router.get('/', authenticateJWT, checkPermissions('read'), roleController.getAll);
-router.post('/', authenticateJWT, checkPermissions('write'), roleController.create);
-router.put('/:id', authenticateJWT, checkPermissions('update'), roleController.update);
-router.delete('/:id', authenticateJWT, checkPermissions('delete'), roleController.delete);
+router.use(authenticateJWT);
+
+router.get('/', checkPermissions('read', 'all', 'Roles'), roleController.getAllRoles);
+router.post('/', checkPermissions('write', 'all', 'Roles'), roleController.createRole);
+router.put('/:id', checkPermissions('write', 'all', 'Roles'), roleController.updateRole);
+router.delete('/:id', checkPermissions('write', 'all', 'Roles'), roleController.deleteRole);
 
 module.exports = router;

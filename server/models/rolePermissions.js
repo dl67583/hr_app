@@ -1,3 +1,4 @@
+// rolePermissions.js (updated)
 module.exports = (sequelize, DataTypes) => {
    const RolePermission = sequelize.define('RolePermission', {
      id: {
@@ -24,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
        allowNull: false,
      },
      resource: {
-       type: DataTypes.STRING,
+       type: DataTypes.STRING,  // 'user', 'project', etc.
        allowNull: false,
      },
      projectId: {
@@ -33,10 +34,9 @@ module.exports = (sequelize, DataTypes) => {
          model: 'Projects',
          key: 'id',
        },
-       allowNull: true, // Only required if the permission is project-specific
+       allowNull: true,
      },
-   }, {     timestamps: false,
-   });
+   }, { timestamps: false });
  
    RolePermission.associate = function(models) {
      RolePermission.belongsTo(models.Role, { foreignKey: 'roleId' });
@@ -45,3 +45,4 @@ module.exports = (sequelize, DataTypes) => {
  
    return RolePermission;
  };
+ 

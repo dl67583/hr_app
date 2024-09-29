@@ -1,21 +1,14 @@
 const express = require('express');
-const { checkPermission } = require('../middlewares/permission');
 const departmentController = require('../controllers/departmentController');
+const { checkPermissions, authenticateJWT } = require('../middlewares/auth');
 const router = express.Router();
 
-// Get all departments (accessible by admin or HR)
-router.get('/', checkPermission('read', 'team', 'Department'), departmentController.getAll);
+router.use(authenticateJWT);
 
-// Get a specific department (accessible by admin or HR)
-router.get('/:id', checkPermission('read', 'team', 'Department'), departmentController.getById);
-
-// Create a new department (accessible by admin)
-router.post('/', checkPermission('write', 'team', 'Department'), departmentController.create);
-
-// Update a department (accessible by admin)
-router.put('/:id', checkPermission('write', 'team', 'Department'), departmentController.update);
-
-// Delete a department (accessible by admin)
-router.delete('/:id', checkPermission('write', 'team', 'Department'), departmentController.deleteDepartment);
+router.get('/', checkPermissions('read', 'all', 'Departments'), departmentController.getAllDepartments);
+router.get('/:id', checkPermissions('read', 'all', 'Departments'), departmentController.getDepartmentById);
+router.post('/', checkPermissions('write', 'all', 'Departments'), departmentController.createDepartment);
+router.put('/:id', checkPermissions('write', 'all', 'Departments'), departmentController.updateDepartment);
+router.delete('/:id', checkPermissions('write', 'all', 'Departments'), departmentController.deleteDepartment);
 
 module.exports = router;

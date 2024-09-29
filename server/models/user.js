@@ -40,10 +40,13 @@ module.exports = (sequelize) => {
         allowNull: false,
       },
       hourlyPay: {
-        type: DataTypes.FLOAT,
-        allowNull: true,
-      }
+        type: DataTypes.TEXT,
+        refreshToken: {
+         type: DataTypes.TEXT,
+         allowNull: true,
+       },
     },
+   },
     {
       indexes: [
         {

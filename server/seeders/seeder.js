@@ -1,217 +1,113 @@
-const bcrypt = require('bcrypt'); // Import bcrypt
+const bcrypt = require('bcrypt');
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     // Step 1: Hash passwords
-    const hashedPasswordJohn = await bcrypt.hash('passwordForJohn', 10);
-    const hashedPasswordJane = await bcrypt.hash('passwordForJane', 10);
-    const hashedPasswordSuperAdmin = await bcrypt.hash('12345678', 10); // Superadmin password
+    const hashedPassword = await bcrypt.hash('12345678', 10);
 
     // Step 2: Seed Roles
     await queryInterface.bulkInsert('Roles', [
-      { name: 'regular' },
-      { name: 'hr' },
       { name: 'superadmin' },
-      { name: 'finance' },
-      { name: 'departmentHead' },
-      { name: 'projectManager' },
+      { name: 'hr' },
+      { name: 'manager' },
+      { name: 'team_lead' },
+      { name: 'employee' },
     ]);
 
-    // Step 3: Seed Departments
-    await queryInterface.bulkInsert('Departments', [
-      { name: 'Finance', departmentHead: null },
-      { name: 'HR', departmentHead: null },
-    ]);
-
-    // Step 4: Seed Users
+    // Step 3: Seed Users
     await queryInterface.bulkInsert('Users', [
-      {
-        name: 'John',
-        surname: 'Doe',
-        username: 'johndoe',
-        email: 'john.doe@example.com',
-        phone: '1234567890',
-        password: hashedPasswordJohn,
-        birthday: '1990-01-01',
-        hourlyPay: 20.5,
-        departmentId: 1, // Assign to Finance
-      },
-      {
-        name: 'Jane',
-        surname: 'Smith',
-        username: 'janesmith',
-        email: 'jane.smith@example.com',
-        phone: '0987654321',
-        password: hashedPasswordJane,
-        birthday: '1992-05-15',
-        hourlyPay: 22.0,
-        departmentId: 2, // Assign to HR
-      },
       {
         name: 'Super',
         surname: 'Admin',
         username: 'superadmin',
         email: 'super.admin@example.com',
         phone: '1112223333',
-        password: hashedPasswordSuperAdmin, // Superadmin password
+        password: hashedPassword,
         birthday: '1985-01-01',
         hourlyPay: 50.0,
-        departmentId: 1, // Assign to Finance (or any department)
+      },
+      {
+        name: 'HR',
+        surname: 'Manager',
+        username: 'hrmanager',
+        email: 'hr.manager@example.com',
+        phone: '2223334444',
+        password: hashedPassword,
+        birthday: '1990-05-15',
+        hourlyPay: 40.0,
+      },
+      {
+        name: 'Project',
+        surname: 'Manager',
+        username: 'projectmanager',
+        email: 'project.manager@example.com',
+        phone: '3334445555',
+        password: hashedPassword,
+        birthday: '1988-07-10',
+        hourlyPay: 45.0,
+      },
+      {
+        name: 'Team',
+        surname: 'Lead',
+        username: 'teamlead',
+        email: 'team.lead@example.com',
+        phone: '4445556666',
+        password: hashedPassword,
+        birthday: '1992-11-05',
+        hourlyPay: 35.0,
+      },
+      {
+        name: 'Employee',
+        surname: 'One',
+        username: 'employeeone',
+        email: 'employee.one@example.com',
+        phone: '5556667777',
+        password: hashedPassword,
+        birthday: '1995-03-25',
+        hourlyPay: 30.0,
       },
     ]);
 
-    // Step 5: Update departmentHead in Departments
-    await queryInterface.bulkUpdate('Departments', { departmentHead: 1 }, { name: 'Finance' });
-    await queryInterface.bulkUpdate('Departments', { departmentHead: 2 }, { name: 'HR' });
-
-    // Step 6: Seed Projects
-    await queryInterface.bulkInsert('Projects', [
-      { name: 'Project Alpha', departmentId: 1 },
-      { name: 'Project Beta', departmentId: 2 },
-    ]);
-
-    // Step 7: Seed User Roles
+    // Step 4: Seed User Roles
     await queryInterface.bulkInsert('UserRoles', [
-      { userId: 1, roleId: 1 }, // John -> regular role
-      { userId: 2, roleId: 2 }, // Jane -> hr role
-      { userId: 3, roleId: 3 }, // Superadmin -> superadmin role
+      { userId: 1, roleId: 1 }, // Superadmin role
+      { userId: 2, roleId: 2 }, // HR role
+      { userId: 3, roleId: 3 }, // Manager role
+      { userId: 4, roleId: 4 }, // Team Lead role
+      { userId: 5, roleId: 5 }, // Employee role
     ]);
 
-    // Step 8: Seed Role Permissions
+    // Step 5: Seed Role Permissions
     await queryInterface.bulkInsert('RolePermissions', [
-      // Permissions for regular role
-      {
-        roleId: 1, // regular role
-        permissionType: 'read',
-        scope: 'individual',
-        resource: 'TimeAttendance',
-      },
-      {
-        roleId: 1, // regular role
-        permissionType: 'write',
-        scope: 'individual',
-        resource: 'Requests',
-      },
-      
-      // Permissions for hr role
-      {
-        roleId: 2, // hr role
-        permissionType: 'read',
-        scope: 'department',
-        resource: 'Users',
-      },
-      {
-        roleId: 2, // hr role
-        permissionType: 'write',
-        scope: 'department',
-        resource: 'Requests',
-      },
-      {
-        roleId: 2, // hr role
-        permissionType: 'read',
-        scope: 'all',
-        resource: 'TimeAttendance',
-      },
+      // Superadmin has full control
+      { roleId: 1, permissionType: 'read', scope: 'all', resource: 'AllResources' },
+      { roleId: 1, permissionType: 'write', scope: 'all', resource: 'AllResources' },
 
-      // Permissions for superadmin role
-      {
-        roleId: 3, // superadmin role
-        permissionType: 'read',
-        scope: 'all',
-        resource: 'AllResources',
-      },
-      {
-        roleId: 3, // superadmin role
-        permissionType: 'write',
-        scope: 'all',
-        resource: 'AllResources',
-      },
+      // HR can manage users, attendance, employee details
+      { roleId: 2, permissionType: 'read', scope: 'department', resource: 'Users' },
+      { roleId: 2, permissionType: 'write', scope: 'department', resource: 'Users' },
+      { roleId: 2, permissionType: 'read', scope: 'department', resource: 'TimeAttendance' },
+      { roleId: 2, permissionType: 'write', scope: 'department', resource: 'TimeAttendance' },
 
-      // Permissions for finance role
-      {
-        roleId: 4, // finance role
-        permissionType: 'read',
-        scope: 'all',
-        resource: 'Payment',
-      },
-      {
-        roleId: 4, // finance role
-        permissionType: 'write',
-        scope: 'all',
-        resource: 'Payment',
-      },
+      // Manager can manage projects and department resources
+      { roleId: 3, permissionType: 'read', scope: 'department', resource: 'Projects' },
+      { roleId: 3, permissionType: 'write', scope: 'department', resource: 'Projects' },
+      { roleId: 3, permissionType: 'read', scope: 'department', resource: 'Resources' },
 
-      // Permissions for department_head role
-      {
-        roleId: 5, // department_head role
-        permissionType: 'read',
-        scope: 'team',
-        resource: 'Users',
-      },
-      {
-        roleId: 5, // department_head role
-        permissionType: 'read',
-        scope: 'team',
-        resource: 'TimeAttendance',
-      },
-      {
-        roleId: 5, // department_head role
-        permissionType: 'write',
-        scope: 'team',
-        resource: 'Requests',
-      },
+      // Team Lead can manage team tasks within a project
+      { roleId: 4, permissionType: 'read', scope: 'project', resource: 'Tasks' },
+      { roleId: 4, permissionType: 'write', scope: 'project', resource: 'Tasks' },
 
-      // Permissions for project_manager role
-      {
-        roleId: 6, // project_manager role
-        permissionType: 'read',
-        scope: 'project',
-        resource: 'Users',
-      },
-      {
-        roleId: 6, // project_manager role
-        permissionType: 'read',
-        scope: 'project',
-        resource: 'TimeAttendance',
-      },
-      {
-        roleId: 6, // project_manager role
-        permissionType: 'write',
-        scope: 'project',
-        resource: 'Projects',
-      },
-    ]);
-
-    // Step 9: Seed Time Attendance
-    await queryInterface.bulkInsert('TimeAttendances', [
-      {
-        userId: 1,
-        timeOfEntering: '08:00:00',
-        timeOfLeaving: '16:00:00',
-      },
-      {
-        userId: 2,
-        timeOfEntering: '09:00:00',
-        timeOfLeaving: '17:00:00',
-      },
-    ]);
-
-    await queryInterface.bulkInsert('ProjectRoleAssignments', [
-      { userId: 1, projectId: 1, roleId: 6 }, // John is Project Manager for Project Alpha
-      { userId: 2, projectId: 1, roleId: 1 }, // Jane is Regular User for Project Alpha
-      { userId: 1, projectId: 2, roleId: 1 }, // John is Regular User for Project Beta
-      { userId: 2, projectId: 2, roleId: 6 }, // Jane is Project Manager for Project Beta
+      // Employee can access self-service features
+      { roleId: 5, permissionType: 'read', scope: 'individual', resource: 'SelfService' },
     ]);
   },
 
   down: async (queryInterface, Sequelize) => {
     // Revert all seeded data
-    await queryInterface.bulkDelete('TimeAttendances', null, {});
     await queryInterface.bulkDelete('RolePermissions', null, {});
     await queryInterface.bulkDelete('UserRoles', null, {});
-    await queryInterface.bulkDelete('Projects', null, {});
     await queryInterface.bulkDelete('Users', null, {});
-    await queryInterface.bulkDelete('Departments', null, {});
     await queryInterface.bulkDelete('Roles', null, {});
   },
 };

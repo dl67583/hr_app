@@ -1,3 +1,4 @@
+// roles.js (updated)
 const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
@@ -9,7 +10,7 @@ module.exports = (sequelize) => {
       autoIncrement: true,
     },
     name: {
-      type: DataTypes.ENUM('regular', 'hr', 'superadmin'), 
+      type: DataTypes.ENUM('superadmin', 'hr', 'manager', 'teamLead', 'employee'), 
       allowNull: false,
     },
   }, {
@@ -17,10 +18,10 @@ module.exports = (sequelize) => {
   });
 
   Role.associate = (models) => {
-   Role.belongsToMany(models.User, {
+    Role.belongsToMany(models.User, {
       through: 'UserRole',
       foreignKey: 'roleId',
-      as: 'Users',  // Alias to be used when fetching users
+      as: 'Users',
     });
     Role.belongsToMany(models.Project, {
       through: models.RolePermission,

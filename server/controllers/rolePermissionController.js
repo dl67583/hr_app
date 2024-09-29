@@ -1,61 +1,49 @@
 const { RolePermission } = require('../models');
 
-const rolePermissionController = {
-  create: async (req, res) => {
-    try {
-      const rolePermission = await RolePermission.create(req.body);
-      res.status(201).json(rolePermission);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  },
-
-  getAll: async (req, res) => {
-    try {
-      const rolePermissions = await RolePermission.findAll();
-      res.status(200).json(rolePermissions);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  },
-
-  getById: async (req, res) => {
-    try {
-      const rolePermission = await RolePermission.findByPk(req.params.id);
-      if (!rolePermission) {
-        return res.status(404).json({ error: 'RolePermission not found' });
-      }
-      res.status(200).json(rolePermission);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  },
-
-  update: async (req, res) => {
-    try {
-      const rolePermission = await RolePermission.findByPk(req.params.id);
-      if (!rolePermission) {
-        return res.status(404).json({ error: 'RolePermission not found' });
-      }
-      await rolePermission.update(req.body);
-      res.status(200).json(rolePermission);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  },
-
-  delete: async (req, res) => {
-    try {
-      const rolePermission = await RolePermission.findByPk(req.params.id);
-      if (!rolePermission) {
-        return res.status(404).json({ error: 'RolePermission not found' });
-      }
-      await rolePermission.destroy();
-      res.status(204).send();
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  },
+exports.getAllRolePermissions = async (req, res) => {
+  try {
+    const permissions = await RolePermission.findAll();
+    res.status(200).json(permissions);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
-module.exports = rolePermissionController;
+exports.getRolePermissionById = async (req, res) => {
+  try {
+    const permission = await RolePermission.findByPk(req.params.id);
+    if (!permission) return res.status(404).json({ message: 'Permission not found' });
+    res.status(200).json(permission);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.createRolePermission = async (req, res) => {
+  try {
+    const permission = await RolePermission.create(req.body);
+    res.status(201).json(permission);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.updateRolePermission = async (req, res) => {
+  try {
+    const permission = await RolePermission.update(req.body, { where: { id: req.params.id } });
+    if (!permission[0]) return res.status(404).json({ message: 'Permission not found' });
+    res.status(200).json({ message: 'Permission updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.deleteRolePermission = async (req, res) => {
+  try {
+    const permission = await RolePermission.destroy({ where: { id: req.params.id } });
+    if (!permission) return res.status(404).json({ message: 'Permission not found' });
+    res.status(200).json({ message: 'Permission deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

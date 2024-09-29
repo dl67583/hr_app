@@ -1,10 +1,10 @@
 const express = require('express');
 const { Permission } = require('../models');
-const { checkPermissions } = require('../middlewares/auth');
+const { checkPermission } = require('../middlewares/auth');
 const router = express.Router();
 
 // Create a new permission
-router.post('/', checkPermissions(['create_permission']), async (req, res) => {
+router.post('/', checkPermission(['create_permission']), async (req, res) => {
   try {
     const permission = await Permission.create(req.body);
     res.status(201).json(permission);
@@ -14,7 +14,7 @@ router.post('/', checkPermissions(['create_permission']), async (req, res) => {
 });
 
 // Get all permissions
-router.get('/', checkPermissions(['view_permissions']), async (req, res) => {
+router.get('/', checkPermission(['view_permissions']), async (req, res) => {
   try {
     const permissions = await Permission.findAll();
     res.status(200).json(permissions);
@@ -24,7 +24,7 @@ router.get('/', checkPermissions(['view_permissions']), async (req, res) => {
 });
 
 // Get a specific permission
-router.get('/:id', checkPermissions(['view_permission']), async (req, res) => {
+router.get('/:id', checkPermission(['view_permission']), async (req, res) => {
   try {
     const permission = await Permission.findByPk(req.params.id);
     if (!permission) {
@@ -37,7 +37,7 @@ router.get('/:id', checkPermissions(['view_permission']), async (req, res) => {
 });
 
 // Update a permission
-router.put('/:id', checkPermissions(['edit_permission']), async (req, res) => {
+router.put('/:id', checkPermission(['edit_permission']), async (req, res) => {
   try {
     const permission = await Permission.findByPk(req.params.id);
     if (!permission) {
@@ -51,7 +51,7 @@ router.put('/:id', checkPermissions(['edit_permission']), async (req, res) => {
 });
 
 // Delete a permission
-router.delete('/:id', checkPermissions(['delete_permission']), async (req, res) => {
+router.delete('/:id', checkPermission(['delete_permission']), async (req, res) => {
   try {
     const permission = await Permission.findByPk(req.params.id);
     if (!permission) {

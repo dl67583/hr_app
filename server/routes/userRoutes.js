@@ -1,21 +1,14 @@
 const express = require('express');
-const { checkPermission } = require('../middlewares/permission');
-const userController = require('../controllers/userController');
+const userController = require('../controllers/userController'); // Ensure this path is correct
+const { authenticateJWT, checkPermissions } = require('../middlewares/auth'); // Import middleware if needed
+
 const router = express.Router();
 
-// Get all users in a department (department head or team access)
-router.get('/department/:departmentId', checkPermission('read', 'department', 'User'), userController.getByDepartment);
-
-// Get a specific user
-router.get('/:id', checkPermission('read', 'individual', 'User'), userController.getById);
-
-// Create a new user
-router.post('/', checkPermission('write', 'team', 'User'), userController.create);
-
-// Update a user
-router.put('/:id', checkPermission('write', 'individual', 'User'), userController.update);
-
-// Delete a user
-router.delete('/:id', checkPermission('write', 'team', 'User'), userController.deleteUser);
+// Example routes for users
+router.get('/', authenticateJWT, checkPermissions('read', 'all', 'Users'), userController.getAllUsers);
+router.get('/:id', authenticateJWT, checkPermissions('read', 'all', 'Users'), userController.getUserById);
+router.post('/', authenticateJWT, checkPermissions('write', 'all', 'Users'), userController.createUser);
+router.put('/:id', authenticateJWT, checkPermissions('write', 'all', 'Users'), userController.updateUser);
+router.delete('/:id', authenticateJWT, checkPermissions('write', 'all', 'Users'), userController.deleteUser);
 
 module.exports = router;
