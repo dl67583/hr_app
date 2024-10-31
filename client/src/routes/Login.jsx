@@ -9,15 +9,15 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();  // Use navigate to redirect
 
-  const handleLogin = async () => {
-    try {
-      await login(username, password);  // Call the login function from AuthContext
-      navigate('/dashboard');  // Redirect to dashboard after successful login
-    } catch (error) {
-      console.error("Login failed:", error);
-      // Handle login failure (e.g., show error message)
-    }
-  };
+  // const handleLogin = async () => {
+  //   try {
+  //     await login(username, password);  // Call the login function from AuthContext
+  //     navigate('/dashboard');  // Redirect to dashboard after successful login
+  //   } catch (error) {
+  //     console.error("Login failed:", error);
+  //     // Handle login failure (e.g., show error message)
+  //   }
+  // };
 
   return (
     <div className='login-container'>
@@ -38,7 +38,7 @@ const Login = () => {
         />
       </div>
       <div className='login-btn'>
-        <button onClick={handleLogin}>Login</button>
+        <button>Login</button>
       </div>
     </div>
   );

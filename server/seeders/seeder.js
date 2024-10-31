@@ -10,7 +10,7 @@ module.exports = {
       { name: 'superadmin' },
       { name: 'hr' },
       { name: 'manager' },
-      { name: 'team_lead' },
+      { name: 'teamlead' },
       { name: 'employee' },
     ]);
 
@@ -25,6 +25,7 @@ module.exports = {
         password: hashedPassword,
         birthday: '1985-01-01',
         hourlyPay: 50.0,
+        roleId: 1,
       },
       {
         name: 'HR',
@@ -35,6 +36,7 @@ module.exports = {
         password: hashedPassword,
         birthday: '1990-05-15',
         hourlyPay: 40.0,
+        roleId: 2,
       },
       {
         name: 'Project',
@@ -45,6 +47,7 @@ module.exports = {
         password: hashedPassword,
         birthday: '1988-07-10',
         hourlyPay: 45.0,
+        roleId: 3,
       },
       {
         name: 'Team',
@@ -55,6 +58,7 @@ module.exports = {
         password: hashedPassword,
         birthday: '1992-11-05',
         hourlyPay: 35.0,
+        roleId: 4,
       },
       {
         name: 'Employee',
@@ -65,6 +69,7 @@ module.exports = {
         password: hashedPassword,
         birthday: '1995-03-25',
         hourlyPay: 30.0,
+        roleId: 5,
       },
     ]);
 

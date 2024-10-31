@@ -12,7 +12,7 @@ const projectRoutes = require('./routes/projectRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const requestRoutes = require('./routes/requestRoutes');
 const timeAttendanceRoutes = require('./routes/timeAttendanceRoutes');
-const authRoutes = require('./routes/authRoutes');
+// const authRoutes = require('./routes/authRoutes');
 const leaveRoutes = require('./routes/leaveRoutes'); // Leave routes (combined maternity, paternity, etc.)
 
 // Create the Express app
@@ -36,7 +36,7 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/requests', requestRoutes);
 app.use('/api/time-attendance', timeAttendanceRoutes);
-app.use('/api/auth', authRoutes);
+// app.use('/api/auth', authRoutes);
 app.use('/api/leaves', leaveRoutes);  // Routes for all leave types (maternity, medical, etc.)
 
 // Sync the database and start the server

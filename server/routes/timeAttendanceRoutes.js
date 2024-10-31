@@ -5,10 +5,10 @@ const { authenticateJWT, checkPermissions } = require('../middlewares/auth'); //
 const router = express.Router();
 
 // Define routes for time attendance
-router.get('/', authenticateJWT, checkPermissions('read', 'all', 'TimeAttendance'), timeAttendanceController.getAllTimeAttendances);
-router.get('/:id', authenticateJWT, checkPermissions('read', 'all', 'TimeAttendance'), timeAttendanceController.getTimeAttendanceById);
-router.post('/', authenticateJWT, checkPermissions('write', 'all', 'TimeAttendance'), timeAttendanceController.createTimeAttendance);
-router.put('/:id', authenticateJWT, checkPermissions('write', 'all', 'TimeAttendance'), timeAttendanceController.updateTimeAttendance);
-router.delete('/:id', authenticateJWT, checkPermissions('write', 'all', 'TimeAttendance'), timeAttendanceController.deleteTimeAttendance);
+router.get('/', timeAttendanceController.getAllTimeAttendances);
+router.get('/:id', timeAttendanceController.getTimeAttendanceById);
+router.post('/', timeAttendanceController.createTimeAttendance);
+router.put('/:id', timeAttendanceController.updateTimeAttendance);
+router.delete('/:id', timeAttendanceController.deleteTimeAttendance);
 
 module.exports = router;

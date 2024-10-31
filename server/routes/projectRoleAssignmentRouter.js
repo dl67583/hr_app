@@ -3,11 +3,11 @@ const projectRoleAssignmentController = require('../controllers/projectRoleAssig
 const { checkPermission, authenticateJWT } = require('../middlewares/auth');
 const router = express.Router();
 
-router.use(authenticateJWT);
+// router.use(authenticateJWT);
 
-router.get('/', checkPermission('read', 'all', 'ProjectRoleAssignments'), projectRoleAssignmentController.getAllProjectRoleAssignments);
-router.post('/', checkPermission('write', 'all', 'ProjectRoleAssignments'), projectRoleAssignmentController.createProjectRoleAssignment);
-router.put('/:id', checkPermission('write', 'all', 'ProjectRoleAssignments'), projectRoleAssignmentController.updateProjectRoleAssignment);
-router.delete('/:id', checkPermission('write', 'all', 'ProjectRoleAssignments'), projectRoleAssignmentController.deleteProjectRoleAssignment);
+router.get('/', projectRoleAssignmentController.getAllProjectRoleAssignments);
+router.post('/', projectRoleAssignmentController.createProjectRoleAssignment);
+router.put('/:id', projectRoleAssignmentController.updateProjectRoleAssignment);
+router.delete('/:id', projectRoleAssignmentController.deleteProjectRoleAssignment);
 
 module.exports = router;

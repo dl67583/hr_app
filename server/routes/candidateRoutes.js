@@ -3,12 +3,12 @@ const candidateController = require('../controllers/candidateController');
 const { checkPermissions, authenticateJWT } = require('../middlewares/auth');
 const router = express.Router();
 
-router.use(authenticateJWT); // Ensure all routes are protected
+// router.use(authenticateJWT); // Ensure all routes are protected
 
-router.get('/', checkPermissions('read', 'all', 'Candidates'), candidateController.getAllCandidates);
-router.get('/:id', checkPermissions('read', 'all', 'Candidates'), candidateController.getCandidateById);
-router.post('/', checkPermissions('write', 'all', 'Candidates'), candidateController.createCandidate);
-router.put('/:id', checkPermissions('write', 'all', 'Candidates'), candidateController.updateCandidate);
-router.delete('/:id', checkPermissions('write', 'all', 'Candidates'), candidateController.deleteCandidate);
+router.get('/', candidateController.getAllCandidates);
+router.get('/:id', candidateController.getCandidateById);
+router.post('/', candidateController.createCandidate);
+router.put('/:id', candidateController.updateCandidate);
+router.delete('/:id', candidateController.deleteCandidate);
 
 module.exports = router;

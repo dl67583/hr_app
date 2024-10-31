@@ -7,26 +7,26 @@ const unpaidLeaveController = require('../controllers/unpaidLeaveController');
 const { checkPermissions, authenticateJWT } = require('../middlewares/auth');
 const router = express.Router();
 
-router.use(authenticateJWT);
+// router.use(authenticateJWT);
 
 // Maternity Leave
-router.get('/maternity', checkPermissions('read', 'all', 'MaternityLeave'), maternityLeaveController.getAllMaternityLeaves);
-router.post('/maternity', checkPermissions('write', 'all', 'MaternityLeave'), maternityLeaveController.createMaternityLeave);
+router.get('/maternity', maternityLeaveController.getAllMaternityLeaves);
+router.post('/maternity', maternityLeaveController.createMaternityLeave);
 
 // Medical Leave
-router.get('/medical', checkPermissions('read', 'all', 'MedicalLeave'), medicalLeaveController.getAllMedicalLeaves);
-router.post('/medical', checkPermissions('write', 'all', 'MedicalLeave'), medicalLeaveController.createMedicalLeave);
+router.get('/medical', medicalLeaveController.getAllMedicalLeaves);
+router.post('/medical', medicalLeaveController.createMedicalLeave);
 
 // Paid Leave
-router.get('/paid', checkPermissions('read', 'all', 'PaidLeave'), paidLeaveController.getAllPaidLeaves);
-router.post('/paid', checkPermissions('write', 'all', 'PaidLeave'), paidLeaveController.createPaidLeave);
+router.get('/paid', paidLeaveController.getAllPaidLeaves);
+router.post('/paid', paidLeaveController.createPaidLeave);
 
 // Paternity Leave
-router.get('/paternity', checkPermissions('read', 'all', 'PaternityLeave'), paternityLeaveController.getAllPaternityLeaves);
-router.post('/paternity', checkPermissions('write', 'all', 'PaternityLeave'), paternityLeaveController.createPaternityLeave);
+router.get('/paternity', paternityLeaveController.getAllPaternityLeaves);
+router.post('/paternity', paternityLeaveController.createPaternityLeave);
 
 // Unpaid Leavex
-router.get('/unpaid', checkPermissions('read', 'all', 'UnpaidLeave'), unpaidLeaveController.getAllUnpaidLeaves);
-router.post('/unpaid', checkPermissions('write', 'all', 'UnpaidLeave'), unpaidLeaveController.createUnpaidLeave);
+router.get('/unpaid', unpaidLeaveController.getAllUnpaidLeaves);
+router.post('/unpaid', unpaidLeaveController.createUnpaidLeave);
 
 module.exports = router;
