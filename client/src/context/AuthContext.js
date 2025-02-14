@@ -1,50 +1,62 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import axios from 'axios';
+import { createContext, useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [authLoading, setAuthLoading] = useState(true);
+  const [token, setToken] = useState(localStorage.getItem("accessToken"));
+  const [roles, setRoles] = useState([]);
+  const [permissions, setPermissions] = useState([]);
+  const navigate = useNavigate();
 
-  // Check for auth token and fetch user data on mount
-  useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      // You can decode the token here if it includes user information (roles, username, etc.)
-      const decoded = jwtDecode(token);  // Assuming you're using jwt-decode or similar package
-      setUser(decoded);  // Set the user directly from the token
-      setAuthLoading(false);  // Stop loading
-    } else {
-      setAuthLoading(false);  // Stop loading if no token
-    }
-  }, []);
-  
-  const login = async (username, password) => {
-    try {
-      const { data } = await axios.post('http://localhost:3001/api/auth/login', { username, password });
-      localStorage.setItem('authToken', data.accessToken);
-      setUser(data.user);  // Store user data in state
-    } catch (error) {
-      console.error('Login failed:', error.response?.data?.message || error.message);
-      throw error;  // Optionally re-throw the error to handle it higher up
-    }
-  };
-  
-
-  const logout = () => {
-    localStorage.removeItem('authToken');
-    delete axios.defaults.headers.common['Authorization'];  // Remove the Authorization header
+  const logout = useCallback(() => {
+    localStorage.removeItem("accessToken");
     setUser(null);
+    setToken(null);
+    setRoles([]);
+    setPermissions([]);
+    navigate("/login");
+  }, [navigate]);
+
+  const login = async (email, password) => {
+    try {
+      console.log("🔍 Sending login request...");
+      const { data } = await axios.post("http://localhost:5000/api/auth/login", { email, password });
+
+      console.log("✅ Login successful. Token received:", data.accessToken);
+      localStorage.setItem("accessToken", data.accessToken);
+      setToken(data.accessToken);
+
+      const decoded = jwtDecode(data.accessToken);
+      setUser(decoded);
+      fetchUserRolesAndPermissions(decoded.id);
+
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("🔥 Login failed:", error.response?.data || error.message);
+    }
   };
-  
+
+  const fetchUserRolesAndPermissions = async (userId) => {
+    try {
+      const { data } = await axios.get(`http://localhost:5000/api/users/${userId}/roles-permissions`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setRoles(data.roles || []);
+      setPermissions(data.permissions || []);
+    } catch (error) {
+      console.error("❌ Error fetching user roles and permissions:", error);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, authLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, logout, roles, permissions }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export default AuthContext;

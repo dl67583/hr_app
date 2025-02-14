@@ -1,20 +1,23 @@
-// In your index.js or where you render your React app
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
-import App from './App';
-import { AuthProvider } from './context/AuthContext';  // Ensure correct path
-import { SidebarProvider } from './context/sidebarContext';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "react-query";
+import App from "./App";
+import "./index.css";
+import { AuthProvider } from "./context/AuthContext";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+// Create a QueryClient instance
+const queryClient = new QueryClient();
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      {/* <AuthProvider> */}
-        <SidebarProvider>
+    <QueryClientProvider client={queryClient}> {/* ✅ Wrap app with QueryClientProvider */}
+      <BrowserRouter> 
+        <AuthProvider>
           <App />
-        </SidebarProvider>
-      {/* </AuthProvider> */}
-    </BrowserRouter>
+        </AuthProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   </React.StrictMode>
 );

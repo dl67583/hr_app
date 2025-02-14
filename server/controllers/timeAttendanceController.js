@@ -1,49 +1,75 @@
-const { TimeAttendance } = require('../models');
+const { TimeAttendance } = require("../models");
+const { getFieldPermissions } = require("../middlewares/checkPermissions");
 
-exports.getAllTimeAttendances = async (req, res) => {
+exports.getAllTimeAttendanceRecords = async (req, res) => {
   try {
-    const attendances = await TimeAttendance.findAll();
-    res.status(200).json(attendances);
+    const { fields } = await getFieldPermissions(req.user.role.id, "TimeAttendance", "read");
+    if (!fields.length) return res.status(403).json({ message: "Access Denied" });
+
+    const records = await TimeAttendance.findAll({ attributes: fields });
+    res.json({ records });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Error fetching time attendance records", error: error.message });
   }
 };
 
-exports.getTimeAttendanceById = async (req, res) => {
+exports.getTimeAttendanceRecordById = async (req, res) => {
   try {
-    const attendance = await TimeAttendance.findByPk(req.params.id);
-    if (!attendance) return res.status(404).json({ message: 'Attendance not found' });
-    res.status(200).json(attendance);
+    const { fields } = await getFieldPermissions(req.user.role.id, "TimeAttendance", "read");
+    if (!fields.length) return res.status(403).json({ message: "Access Denied" });
+
+    const record = await TimeAttendance.findByPk(req.params.id, { attributes: fields });
+    if (!record) return res.status(404).json({ message: "Time attendance record not found" });
+
+    res.json({ record });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Error fetching time attendance record", error: error.message });
   }
 };
 
-exports.createTimeAttendance = async (req, res) => {
+exports.createTimeAttendanceRecord = async (req, res) => {
   try {
-    const attendance = await TimeAttendance.create(req.body);
-    res.status(201).json(attendance);
+    const hasPermission = await getFieldPermissions(req.user.role.id, "TimeAttendance", "create");
+    if (!hasPermission.length) return res.status(403).json({ message: "Access Denied" });
+
+    const record = await TimeAttendance.create(req.body);
+    res.status(201).json({ message: "Time attendance record created successfully", record });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Error creating time attendance record", error: error.message });
   }
 };
 
-exports.updateTimeAttendance = async (req, res) => {
+exports.updateTimeAttendanceRecord = async (req, res) => {
   try {
-    const attendance = await TimeAttendance.update(req.body, { where: { userId: req.params.userId } });
-    if (!attendance[0]) return res.status(404).json({ message: 'Attendance not found' });
-    res.status(200).json({ message: 'Attendance updated successfully' });
+    const { fields } = await getFieldPermissions(req.user.role.id, "TimeAttendance", "update");
+    if (!fields.length) return res.status(403).json({ message: "Access Denied" });
+
+    const record = await TimeAttendance.findByPk(req.params.id);
+    if (!record) return res.status(404).json({ message: "Time attendance record not found" });
+
+    const updatedData = {};
+    Object.keys(req.body).forEach((key) => {
+      if (fields.includes(key)) updatedData[key] = req.body[key];
+    });
+
+    await record.update(updatedData);
+    res.json({ message: "Time attendance record updated successfully", record });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Error updating time attendance record", error: error.message });
   }
 };
 
-exports.deleteTimeAttendance = async (req, res) => {
+exports.deleteTimeAttendanceRecord = async (req, res) => {
   try {
-    const attendance = await TimeAttendance.destroy({ where: { userId: req.params.userId } });
-    if (!attendance) return res.status(404).json({ message: 'Attendance not found' });
-    res.status(200).json({ message: 'Attendance deleted successfully' });
+    const hasPermission = await getFieldPermissions(req.user.role.id, "TimeAttendance", "delete");
+    if (!hasPermission.length) return res.status(403).json({ message: "Access Denied" });
+
+    const record = await TimeAttendance.findByPk(req.params.id);
+    if (!record) return res.status(404).json({ message: "Time attendance record not found" });
+
+    await record.destroy();
+    res.json({ message: "Time attendance record deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Error deleting time attendance record", error: error.message });
   }
 };

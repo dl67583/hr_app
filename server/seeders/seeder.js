@@ -1,118 +1,124 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcryptjs");
 
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
-    // Step 1: Hash passwords
-    const hashedPassword = await bcrypt.hash('12345678', 10);
+  up: async (queryInterface) => {
+    const hashedPassword = await bcrypt.hash("123", 10);
 
-    // Step 2: Seed Roles
-    await queryInterface.bulkInsert('Roles', [
-      { name: 'superadmin' },
-      { name: 'hr' },
-      { name: 'manager' },
-      { name: 'teamlead' },
-      { name: 'employee' },
+    // 🔹 Insert Departments
+    await queryInterface.bulkInsert("Departments", [
+      { name: "IT", createdAt: new Date(), updatedAt: new Date() },
+      { name: "HR", createdAt: new Date(), updatedAt: new Date() },
+      { name: "Finance", createdAt: new Date(), updatedAt: new Date() },
+      { name: "Marketing", createdAt: new Date(), updatedAt: new Date() },
     ]);
 
-    // Step 3: Seed Users
-    await queryInterface.bulkInsert('Users', [
-      {
-        name: 'Super',
-        surname: 'Admin',
-        username: 'superadmin',
-        email: 'super.admin@example.com',
-        phone: '1112223333',
-        password: hashedPassword,
-        birthday: '1985-01-01',
-        hourlyPay: 50.0,
-        roleId: 1,
-      },
-      {
-        name: 'HR',
-        surname: 'Manager',
-        username: 'hrmanager',
-        email: 'hr.manager@example.com',
-        phone: '2223334444',
-        password: hashedPassword,
-        birthday: '1990-05-15',
-        hourlyPay: 40.0,
-        roleId: 2,
-      },
-      {
-        name: 'Project',
-        surname: 'Manager',
-        username: 'projectmanager',
-        email: 'project.manager@example.com',
-        phone: '3334445555',
-        password: hashedPassword,
-        birthday: '1988-07-10',
-        hourlyPay: 45.0,
-        roleId: 3,
-      },
-      {
-        name: 'Team',
-        surname: 'Lead',
-        username: 'teamlead',
-        email: 'team.lead@example.com',
-        phone: '4445556666',
-        password: hashedPassword,
-        birthday: '1992-11-05',
-        hourlyPay: 35.0,
-        roleId: 4,
-      },
-      {
-        name: 'Employee',
-        surname: 'One',
-        username: 'employeeone',
-        email: 'employee.one@example.com',
-        phone: '5556667777',
-        password: hashedPassword,
-        birthday: '1995-03-25',
-        hourlyPay: 30.0,
-        roleId: 5,
-      },
+    // 🔹 Fetch Department IDs
+    const departments = await queryInterface.sequelize.query("SELECT id, name FROM Departments;", {
+      type: queryInterface.sequelize.QueryTypes.SELECT
+    });
+
+    const departmentMap = {};
+    departments.forEach(dept => { departmentMap[dept.name] = dept.id; });
+
+    // 🔹 Insert Roles
+    await queryInterface.bulkInsert("Roles", [
+      { name: "Employee", createdAt: new Date(), updatedAt: new Date() },
+      { name: "Manager", createdAt: new Date(), updatedAt: new Date() },
+      { name: "IT Manager", createdAt: new Date(), updatedAt: new Date() },
+      { name: "HR", createdAt: new Date(), updatedAt: new Date() },
+      { name: "Superadmin", createdAt: new Date(), updatedAt: new Date() },
     ]);
 
-    // Step 4: Seed User Roles
-    await queryInterface.bulkInsert('UserRoles', [
-      { userId: 1, roleId: 1 }, // Superadmin role
-      { userId: 2, roleId: 2 }, // HR role
-      { userId: 3, roleId: 3 }, // Manager role
-      { userId: 4, roleId: 4 }, // Team Lead role
-      { userId: 5, roleId: 5 }, // Employee role
+    // 🔹 Fetch Role IDs
+    const roles = await queryInterface.sequelize.query("SELECT id, name FROM Roles;", {
+      type: queryInterface.sequelize.QueryTypes.SELECT
+    });
+
+    const roleMap = {};
+    roles.forEach(role => { roleMap[role.name] = role.id; });
+
+    // 🔹 Insert Users
+    await queryInterface.bulkInsert("Users", [
+      { name: "John", surname: "Doe", username: "johndoe", email: "john@example.com", password: hashedPassword, departmentId: departmentMap["IT"], createdAt: new Date(), updatedAt: new Date() },
+      { name: "Alice", surname: "Smith", username: "alicesmith", email: "alice@example.com", password: hashedPassword, departmentId: departmentMap["HR"], createdAt: new Date(), updatedAt: new Date() },
+      { name: "Bob", surname: "Johnson", username: "bobjohnson", email: "bob@example.com", password: hashedPassword, departmentId: departmentMap["Finance"], createdAt: new Date(), updatedAt: new Date() },
+      { name: "Charlie", surname: "Davis", username: "charliedavis", email: "charlie@example.com", password: hashedPassword, departmentId: departmentMap["Marketing"], createdAt: new Date(), updatedAt: new Date() },
+      { name: "Super", surname: "Admin", username: "superadmin", email: "superadmin@example.com", password: hashedPassword, createdAt: new Date(), updatedAt: new Date() },
     ]);
 
-    // Step 5: Seed Role Permissions
-    await queryInterface.bulkInsert('RolePermissions', [
-      // Superadmin has full control
-      { roleId: 1, permissionType: 'read', scope: 'all', resource: 'AllResources' },
-      { roleId: 1, permissionType: 'write', scope: 'all', resource: 'AllResources' },
+    // 🔹 Fetch User IDs
+    const users = await queryInterface.sequelize.query("SELECT id, email FROM Users;", {
+      type: queryInterface.sequelize.QueryTypes.SELECT
+    });
 
-      // HR can manage users, attendance, employee details
-      { roleId: 2, permissionType: 'read', scope: 'department', resource: 'Users' },
-      { roleId: 2, permissionType: 'write', scope: 'department', resource: 'Users' },
-      { roleId: 2, permissionType: 'read', scope: 'department', resource: 'TimeAttendance' },
-      { roleId: 2, permissionType: 'write', scope: 'department', resource: 'TimeAttendance' },
+    const userMap = {};
+    users.forEach(user => { userMap[user.email] = user.id; });
 
-      // Manager can manage projects and department resources
-      { roleId: 3, permissionType: 'read', scope: 'department', resource: 'Projects' },
-      { roleId: 3, permissionType: 'write', scope: 'department', resource: 'Projects' },
-      { roleId: 3, permissionType: 'read', scope: 'department', resource: 'Resources' },
-
-      // Team Lead can manage team tasks within a project
-      { roleId: 4, permissionType: 'read', scope: 'project', resource: 'Tasks' },
-      { roleId: 4, permissionType: 'write', scope: 'project', resource: 'Tasks' },
-
-      // Employee can access self-service features
-      { roleId: 5, permissionType: 'read', scope: 'individual', resource: 'SelfService' },
+    // 🔹 Assign Roles to Users
+    await queryInterface.bulkInsert("UserRoles", [
+      { userId: userMap["john@example.com"], roleId: roleMap["Employee"], createdAt: new Date(), updatedAt: new Date() },
+      { userId: userMap["alice@example.com"], roleId: roleMap["Manager"], createdAt: new Date(), updatedAt: new Date() },
+      { userId: userMap["bob@example.com"], roleId: roleMap["IT Manager"], createdAt: new Date(), updatedAt: new Date() },
+      { userId: userMap["charlie@example.com"], roleId: roleMap["HR"], createdAt: new Date(), updatedAt: new Date() },
+      { userId: userMap["superadmin@example.com"], roleId: roleMap["Superadmin"], createdAt: new Date(), updatedAt: new Date() },
     ]);
+
+    // 🔹 Define Role Permissions
+    const allTables = ["Users", "Departments", "Roles", "UserRoles", "RolePermissions", "Requests", "Leaves", "Payments", "TimeAttendance"];
+    const rolePermissions = [];
+
+    // 🔹 Superadmin: Full access to everything
+    allTables.forEach(table => {
+      ["read", "create", "update", "delete"].forEach(action => {
+        rolePermissions.push({
+          roleId: roleMap["Superadmin"],
+          resource: table,
+          action: action,
+          fields: "*", 
+          scope: "all", 
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      });
+    });
+
+    // 🔹 Manager: Can manage users in their department, approve requests, and view time attendance
+    rolePermissions.push(
+      { roleId: roleMap["Manager"], resource: "Users", action: "read", fields: "id,name,email,departmentId", scope: "department", createdAt: new Date(), updatedAt: new Date() },
+      { roleId: roleMap["Manager"], resource: "Users", action: "update", fields: "email", scope: "department", createdAt: new Date(), updatedAt: new Date() },
+      { roleId: roleMap["Manager"], resource: "Requests", action: "approve", fields: "*", scope: "department", createdAt: new Date(), updatedAt: new Date() },
+      { roleId: roleMap["Manager"], resource: "TimeAttendance", action: "read", fields: "*", scope: "department", createdAt: new Date(), updatedAt: new Date() }
+    );
+
+    // 🔹 IT Manager: Can create and manage IT users
+    rolePermissions.push(
+      { roleId: roleMap["IT Manager"], resource: "Users", action: "create", fields: "id,name,email", scope: "department", createdAt: new Date(), updatedAt: new Date() },
+      { roleId: roleMap["IT Manager"], resource: "Users", action: "update", fields: "email", scope: "department", createdAt: new Date(), updatedAt: new Date() }
+    );
+
+    // 🔹 HR: Can manage leaves, requests, and view employees
+    rolePermissions.push(
+      { roleId: roleMap["HR"], resource: "Users", action: "read", fields: "id,name,email,departmentId", scope: "department", createdAt: new Date(), updatedAt: new Date() },
+      { roleId: roleMap["HR"], resource: "Leaves", action: "manage", fields: "*", scope: "department", createdAt: new Date(), updatedAt: new Date() }
+    );
+
+    // 🔹 Employee: Can only read their own profile and submit requests
+    rolePermissions.push(
+      { roleId: roleMap["Employee"], resource: "Users", action: "read", fields: "*", scope: "own", createdAt: new Date(), updatedAt: new Date() },
+      { roleId: roleMap["Employee"], resource: "Departments", action: "read", fields: "*", scope: "own", createdAt: new Date(), updatedAt: new Date() },
+      { roleId: roleMap["Employee"], resource: "Requests", action: "create", fields: "*", scope: "own", createdAt: new Date(), updatedAt: new Date() }
+    );
+
+    await queryInterface.bulkInsert("RolePermissions", rolePermissions);
+
+    console.log("✅ Database seeded successfully with correct permissions.");
   },
 
-  down: async (queryInterface, Sequelize) => {
-    // Revert all seeded data
-    await queryInterface.bulkDelete('RolePermissions', null, {});
-    await queryInterface.bulkDelete('UserRoles', null, {});
-    await queryInterface.bulkDelete('Users', null, {});
-    await queryInterface.bulkDelete('Roles', null, {});
-  },
+  down: async (queryInterface) => {
+    await queryInterface.bulkDelete("RolePermissions", null, {});
+    await queryInterface.bulkDelete("UserRoles", null, {});
+    await queryInterface.bulkDelete("Users", null, {});
+    await queryInterface.bulkDelete("Roles", null, {});
+    await queryInterface.bulkDelete("Departments", null, {});
+  }
 };

@@ -1,62 +1,61 @@
-const express = require('express');
-const db = require('./models');
-const path = require('path');
-const cors = require('cors');
-
-// Import routes
-const userRoutes = require('./routes/userRoutes');
-const departmentRoutes = require('./routes/departmentRoutes');
-const candidateRoutes = require('./routes/candidateRoutes');
-const roleRoutes = require('./routes/roleRoutes');
-const projectRoutes = require('./routes/projectRoutes');
-const paymentRoutes = require('./routes/paymentRoutes');
-const requestRoutes = require('./routes/requestRoutes');
-const timeAttendanceRoutes = require('./routes/timeAttendanceRoutes');
-// const authRoutes = require('./routes/authRoutes');
-const leaveRoutes = require('./routes/leaveRoutes'); // Leave routes (combined maternity, paternity, etc.)
-
-// Create the Express app
+const express = require("express");
+const cors = require("cors");
+const path = require("path");
+const db = require("./models"); // Import database connection
+require("dotenv").config({ path: "./.env" });
 const app = express();
 
-// Set the port for the backend
-const PORT = process.env.PORT || 3001;
-
-// Enable CORS for requests coming from other origins (e.g., frontend running on port 3000)
-app.use(cors());  // Allows requests from any origin. Optionally, restrict to specific origins.
-
-// Enable Express to parse incoming JSON requests
+// Middleware
 app.use(express.json());
 
-// Use the routes for the various API endpoints
-app.use('/api/users', userRoutes);
-app.use('/api/departments', departmentRoutes);
-app.use('/api/candidates', candidateRoutes);
-app.use('/api/roles', roleRoutes);
-app.use('/api/projects', projectRoutes);
-app.use('/api/payments', paymentRoutes);
-app.use('/api/requests', requestRoutes);
-app.use('/api/time-attendance', timeAttendanceRoutes);
-// app.use('/api/auth', authRoutes);
-app.use('/api/leaves', leaveRoutes);  // Routes for all leave types (maternity, medical, etc.)
+app.use(cors({
+  origin: "http://localhost:3000", // ✅ Allow frontend requests
+  credentials: true,               // ✅ Allow cookies and authentication headers
+}));
+// Import routes
+const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
+const roleRoutes = require("./routes/roleRoutes");
+const rolePermissionRoutes = require("./routes/rolePermissionRoutes");
+const userRoleRoutes = require("./routes/userRoleRoutes");
+const entityRoleAssignmentRoutes = require("./routes/entityRoleAssignmentRoutes");
+const departmentRoutes = require("./routes/departmentRoutes");
+const candidateRoutes = require("./routes/candidateRoutes");
+const leaveRoutes = require("./routes/leaveRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
+const timeAttendanceRoutes = require("./routes/timeAttendanceRoutes");
+const requestRoutes = require("./routes/requestRoutes");
 
-// Sync the database and start the server
-db.sequelize.sync({ alter: true }).then(() => {
-  console.log('Database synced');
+// Use API routes
+app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/roles", roleRoutes);
+app.use("/api/permissions", rolePermissionRoutes);
+app.use("/api/user-roles", userRoleRoutes);
+app.use("/api/entity-roles", entityRoleAssignmentRoutes);
+app.use("/api/departments", departmentRoutes);
+app.use("/api/candidates", candidateRoutes);
+app.use("/api/leaves", leaveRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/time-attendance", timeAttendanceRoutes);
+app.use("/api/requests", requestRoutes);
 
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
+// Serve static frontend files if applicable
+app.use(express.static(path.join(__dirname, "../client/public")));
 
-  // Optionally, add any scheduled jobs if necessary
-  // schedulePayments();
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../client/public/index.html"));
 });
 
-// Serve static files from the React frontend (if applicable)
-app.use(express.static(path.join(__dirname, '../client/public')));
+// Database sync with proper logging
+db.sequelize.sync({ alter: true, logging: console.log }).then(() => {
+  console.log("✅ Database synced successfully");
 
-// Send all requests to the frontend (React)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/public/index.html'));
+  // Start the server
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+}).catch((err) => {
+  console.error("❌ Database sync failed:", err);
 });
 
 module.exports = app;

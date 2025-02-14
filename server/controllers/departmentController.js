@@ -1,49 +1,93 @@
-const { Department } = require('../models');
+const { Department } = require("../models");
+const { getFieldPermissions } = require("../middlewares/checkPermissions");
 
 exports.getAllDepartments = async (req, res) => {
   try {
-    const departments = await Department.findAll();
-    res.status(200).json(departments);
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: "Unauthorized: User not authenticated" });
+    }
+
+    console.log("🔍 Fetching departments for user:", req.user.id);
+
+    const { fields, scopes } = await getFieldPermissions(req.user.id, "Departments", "read");
+
+    if (!fields.length) return res.status(403).json({ message: "Access Denied" });
+
+    let whereClause = {};
+    if (scopes.includes("department")) whereClause.id = req.user.departmentId;
+    else if (!scopes.includes("all")) whereClause.id = null; // Prevent unauthorized access
+
+    const departments = await Department.findAll({
+      attributes: fields.includes("*") ? undefined : fields, // ✅ Fix SQL syntax error
+      where: whereClause,
+    });
+
+    console.log("✅ Departments fetched:", departments.length);
+    res.json({ departments });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("🔥 Error fetching departments:", error);
+    res.status(500).json({ message: "Error fetching departments", error: error.message });
   }
 };
 
+
 exports.getDepartmentById = async (req, res) => {
   try {
-    const department = await Department.findByPk(req.params.id);
-    if (!department) return res.status(404).json({ message: 'Department not found' });
-    res.status(200).json(department);
+    const { fields } = await getFieldPermissions(req.user.role.id, "Departments", "read");
+    if (!fields.length) return res.status(403).json({ message: "Access Denied" });
+
+    const department = await Department.findByPk(req.params.id, { attributes: fields });
+    if (!department) return res.status(404).json({ message: "Department not found" });
+
+    res.json({ department });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Error fetching department", error: error.message });
   }
 };
 
 exports.createDepartment = async (req, res) => {
   try {
+    const hasPermission = await getFieldPermissions(req.user.role.id, "Departments", "create");
+    if (!hasPermission.length) return res.status(403).json({ message: "Access Denied" });
+
     const department = await Department.create(req.body);
-    res.status(201).json(department);
+    res.status(201).json({ message: "Department created successfully", department });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Error creating department", error: error.message });
   }
 };
 
 exports.updateDepartment = async (req, res) => {
   try {
-    const department = await Department.update(req.body, { where: { id: req.params.id } });
-    if (!department[0]) return res.status(404).json({ message: 'Department not found' });
-    res.status(200).json({ message: 'Department updated successfully' });
+    const { fields } = await getFieldPermissions(req.user.role.id, "Departments", "update");
+    if (!fields.length) return res.status(403).json({ message: "Access Denied" });
+
+    const department = await Department.findByPk(req.params.id);
+    if (!department) return res.status(404).json({ message: "Department not found" });
+
+    const updatedData = {};
+    Object.keys(req.body).forEach((key) => {
+      if (fields.includes(key)) updatedData[key] = req.body[key];
+    });
+
+    await department.update(updatedData);
+    res.json({ message: "Department updated successfully", department });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Error updating department", error: error.message });
   }
 };
 
 exports.deleteDepartment = async (req, res) => {
   try {
-    const department = await Department.destroy({ where: { id: req.params.id } });
-    if (!department) return res.status(404).json({ message: 'Department not found' });
-    res.status(200).json({ message: 'Department deleted successfully' });
+    const hasPermission = await getFieldPermissions(req.user.role.id, "Departments", "delete");
+    if (!hasPermission.length) return res.status(403).json({ message: "Access Denied" });
+
+    const department = await Department.findByPk(req.params.id);
+    if (!department) return res.status(404).json({ message: "Department not found" });
+
+    await department.destroy();
+    res.json({ message: "Department deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Error deleting department", error: error.message });
   }
 };

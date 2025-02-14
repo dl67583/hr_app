@@ -1,8 +1,7 @@
-// roles.js (updated)
 const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
-  const Role = sequelize.define('Role', {
+  const Role = sequelize.define("Role", {
     id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -10,33 +9,21 @@ module.exports = (sequelize) => {
       autoIncrement: true,
     },
     name: {
-      type: DataTypes.ENUM('superadmin', 'hr', 'manager', 'teamLead', 'employee'), 
+      type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
-  }, {
-   timestamps: false, // Disable timestamps
   });
 
   Role.associate = (models) => {
-    Role.hasMany(models.User, {
+    Role.belongsToMany(models.User, {
+      through: models.UserRole,
       foreignKey: "roleId",
-      as: "Users",
+      as: "Users"
     });
-    
-    Role.belongsToMany(models.Project, {
-      through: models.RolePermission,
-      foreignKey: 'roleId',
-      as: 'Projects',
-    });
-    Role.belongsToMany(models.Department, {
-      through: models.RolePermission,
-      foreignKey: 'roleId',
-      as: 'Departments',
-    });
-    Role.hasMany(models.RolePermission, {
-      foreignKey: 'roleId',
-      as: 'Permissions',
-    });
+
+    Role.hasMany(models.RolePermission, { foreignKey: "roleId", as: "Permissions" });
+    Role.hasMany(models.EntityRoleAssignment, { foreignKey: "roleId", as: "EntityRoles" });
   };
 
   return Role;

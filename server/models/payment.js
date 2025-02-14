@@ -1,7 +1,7 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
-  const Payment = sequelize.define('Payment', {
+  const Payment = sequelize.define("Payment", {
     id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -11,37 +11,20 @@ module.exports = (sequelize) => {
     userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      field: 'userId',
       references: {
-        model: 'Users',
-        key: 'id',
+        model: "Users",
+        key: "id",
       },
     },
     month: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     year: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     hoursWorked: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
-    regularHours: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
-    overtimeHours: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
-    weekendHours: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
-    nightHours: {
       type: DataTypes.FLOAT,
       allowNull: false,
     },
@@ -52,7 +35,7 @@ module.exports = (sequelize) => {
   });
 
   Payment.associate = (models) => {
-    Payment.belongsTo(models.User, { foreignKey: 'userId', targetKey: 'id' });
+    Payment.belongsTo(models.User, { foreignKey: "userId" });
   };
 
   return Payment;

@@ -4,26 +4,33 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server"
+    "start": "node server",
+    "dev": "concurrently \"nodemon server\" \"wait-on http://localhost:5000 && npx sequelize-cli db:seed:all\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
+    "concurrently": "^9.1.2",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^4.19.2",
+    "express-validator": "^7.2.1",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.9.3",
     "node-cron": "^3.0.3",
+    "redis": "^4.7.0",
     "sequelize": "^6.37.2",
     "sequelize-cli": "^6.6.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "wait-on": "^8.0.2"
   }
 }

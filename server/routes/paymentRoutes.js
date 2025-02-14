@@ -1,14 +1,12 @@
-const express = require('express');
-const paymentController = require('../controllers/paymentController');
-const { checkPermissions, authenticateJWT } = require('../middlewares/auth');
+const express = require("express");
 const router = express.Router();
+const paymentController = require("../controllers/paymentController");
+const authenticate = require("../middlewares/authMiddleware");
 
-// router.use(authenticateJWT);
-
-router.get('/', paymentController.getAllPayments);
-router.get('/:id', paymentController.getPaymentById);
-router.post('/', paymentController.createPayment);
-router.put('/:id', paymentController.updatePayment);
-router.delete('/:id', paymentController.deletePayment);
+router.get("/", authenticate, paymentController.getAllPayments);
+router.get("/:id", authenticate, paymentController.getPaymentById);
+router.post("/", authenticate, paymentController.createPayment);
+router.put("/:id", authenticate, paymentController.updatePayment);
+router.delete("/:id", authenticate, paymentController.deletePayment);
 
 module.exports = router;

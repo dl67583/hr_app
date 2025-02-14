@@ -1,13 +1,12 @@
-const express = require('express');
-const roleController = require('../controllers/roleController');
-const { checkPermissions, authenticateJWT } = require('../middlewares/auth');
+const express = require("express");
 const router = express.Router();
+const roleController = require("../controllers/roleController");
+const authenticate = require("../middlewares/authMiddleware");
 
-// router.use(authenticateJWT);
-
-router.get('/', roleController.getAllRoles);
-router.post('/', roleController.createRole);
-router.put('/:id', roleController.updateRole);
-router.delete('/:id', roleController.deleteRole);
+router.get("/", authenticate, roleController.getAllRoles);
+router.get("/:id", authenticate, roleController.getRoleById);
+router.post("/", authenticate, roleController.createRole);
+router.put("/:id", authenticate, roleController.updateRole);
+router.delete("/:id", authenticate, roleController.deleteRole);
 
 module.exports = router;

@@ -1,14 +1,12 @@
-const express = require('express');
-const departmentController = require('../controllers/departmentController');
-const { checkPermissions, authenticateJWT } = require('../middlewares/auth');
+const express = require("express");
 const router = express.Router();
+const departmentController = require("../controllers/departmentController");
+const authenticate = require("../middlewares/authMiddleware");
 
-// router.use(authenticateJWT);
-
-router.get('/', departmentController.getAllDepartments);
-router.get('/:id', departmentController.getDepartmentById);
-router.post('/', departmentController.createDepartment);
-router.put('/:id', departmentController.updateDepartment);
-router.delete('/:id', departmentController.deleteDepartment);
+router.get("/", authenticate, departmentController.getAllDepartments);
+router.get("/:id", authenticate, departmentController.getDepartmentById);
+router.post("/", authenticate, departmentController.createDepartment);
+router.put("/:id", authenticate, departmentController.updateDepartment);
+router.delete("/:id", authenticate, departmentController.deleteDepartment);
 
 module.exports = router;

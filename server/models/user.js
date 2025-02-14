@@ -1,81 +1,29 @@
-const { DataTypes } = require("sequelize");
+const bcrypt = require("bcryptjs");
 
-module.exports = (sequelize) => {
-  const User = sequelize.define(
-    "User",
-    {
-      id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        primaryKey: true,
-        autoIncrement: true,
-      },
-      name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      surname: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      username: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-      },
-      email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-      },
-      phone: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      password: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      birthday: {
-        type: DataTypes.DATEONLY,
-        allowNull: false,
-      },
-      hourlyPay: {
-        type: DataTypes.TEXT,
-      },
-      refreshToken: {
-        type: DataTypes.TEXT,  // Ensure refresh token field exists
-        allowNull: true,
-      },
-    },
-    {
-      indexes: [
-        {
-          unique: true,
-          fields: ["email", "username"],
-        },
-      ],
-    }
-  );
+module.exports = (sequelize, DataTypes) => {
+  const User = sequelize.define("User", {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING, allowNull: false },
+    surname: { type: DataTypes.STRING, allowNull: false },
+    username: { type: DataTypes.STRING, allowNull: false, unique: true },
+    email: { type: DataTypes.STRING, allowNull: false, unique: true },
+    password: { type: DataTypes.STRING, allowNull: false },
+    birthday: { type: DataTypes.DATEONLY, allowNull: false },
+    hourlyPay: { type: DataTypes.STRING },
+    refreshToken: { type: DataTypes.TEXT, allowNull: true },
+    departmentId: { type: DataTypes.INTEGER, allowNull: true }, // ✅ Link users to a department
+  });
 
   User.associate = (models) => {
-    User.hasMany(models.TimeAttendance, {
+    User.belongsToMany(models.Role, {
+      through: models.UserRole,
       foreignKey: "userId",
+      as: "Roles",
     });
-    User.hasMany(models.Request, {
-      foreignKey: "userId",
-    });
-    User.belongsTo(models.Department, {
-      foreignKey: "departmentId",
-      allowNull: true,
-    });
-    User.belongsTo(models.Role, {
-      foreignKey: "roleId",  // You can store the roleId directly in the User model
-      as: "Role",
-    });
-    
-    
+    User.belongsTo(models.Department, { foreignKey: "departmentId", as: "Department" });
   };
+
+
 
   return User;
 };

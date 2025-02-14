@@ -1,7 +1,7 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
-  const Department = sequelize.define('Department', {
+  const Department = sequelize.define("Department", {
     id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -16,23 +16,17 @@ module.exports = (sequelize) => {
   });
 
   Department.associate = (models) => {
-    Department.hasMany(models.Project, {
-      foreignKey: 'departmentId',
-      as: 'projects',
-    });
-    Department.belongsToMany(models.Role, {
-      through: models.RolePermission,
-      foreignKey: 'departmentId',
-      as: 'Roles',
-    });
+
     Department.hasMany(models.User, {
-      foreignKey: 'departmentId',
-      as: 'users',
-      onDelete:"NO ACTION"
+      foreignKey: "departmentId",
+      as: "users",
     });
-    Department.belongsTo(models.User, {
-      foreignKey: 'departmentHead',
-      as: 'head',
+    Department.hasMany(models.EntityRoleAssignment, {
+      foreignKey: "entityId",
+      constraints: false,
+      scope: {
+        entityType: "department",
+      },
     });
   };
 
