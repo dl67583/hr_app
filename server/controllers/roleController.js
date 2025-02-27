@@ -1,29 +1,38 @@
-const { Role } = require("../models");
+const { Role, RolePermission } = require("../models");
 const { getFieldPermissions } = require("../middlewares/checkPermissions");
 
 exports.getAllRoles = async (req, res) => {
   try {
+    console.log("🔍 Fetching roles...");
+
     if (!req.user || !req.user.id) {
       return res.status(401).json({ message: "Unauthorized: User not authenticated" });
     }
 
-    console.log("🔍 Fetching roles for user ID:", req.user.id);
+    const { fields = [], scopes = [], actions = [] } = await getFieldPermissions(req.user.id, "Roles", "read");
 
-    const { fields, scopes } = await getFieldPermissions(req.user.id, "Roles", "read");
+    console.log("✅ Permissions for Roles:", { fields, scopes, actions });
 
-    if (!fields.length) return res.status(403).json({ message: "Access Denied" });
+    if (!actions.includes("read")) {
+      return res.status(403).json({ message: "Access Denied: Missing read permission" });
+    }
+
+    const attributes = fields.includes("*") ? undefined : fields; // ✅ Allow all fields if "*"
 
     const roles = await Role.findAll({
-      attributes: fields.includes("*") ? undefined : fields, // ✅ Fix SQL syntax error
+      attributes: fields.includes("*") ? undefined : fields,
+      include: [{ model: RolePermission, as: "Permissions" }],
     });
-
-    console.log("✅ Roles fetched:", roles.length);
+    
+    console.log(`✅ Fetched ${roles.length} roles.`);
     res.json({ roles });
   } catch (error) {
     console.error("🔥 Error fetching roles:", error);
     res.status(500).json({ message: "Error fetching roles", error: error.message });
   }
 };
+
+
 
 exports.getRoleById = async (req, res) => {
   try {

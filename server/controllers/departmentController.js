@@ -3,32 +3,33 @@ const { getFieldPermissions } = require("../middlewares/checkPermissions");
 
 exports.getAllDepartments = async (req, res) => {
   try {
+    console.log("🔍 Fetching departments...");
+
     if (!req.user || !req.user.id) {
       return res.status(401).json({ message: "Unauthorized: User not authenticated" });
     }
 
-    console.log("🔍 Fetching departments for user:", req.user.id);
+    const { fields = [], scopes = [], actions = [] } = await getFieldPermissions(req.user.id, "Departments", "read");
 
-    const { fields, scopes } = await getFieldPermissions(req.user.id, "Departments", "read");
+    console.log("✅ Permissions for Departments:", { fields, scopes, actions });
 
-    if (!fields.length) return res.status(403).json({ message: "Access Denied" });
+    if (!actions.includes("read")) {
+      return res.status(403).json({ message: "Access Denied: Missing read permission" });
+    }
 
-    let whereClause = {};
-    if (scopes.includes("department")) whereClause.id = req.user.departmentId;
-    else if (!scopes.includes("all")) whereClause.id = null; // Prevent unauthorized access
+    const attributes = fields.includes("*") ? undefined : fields; // ✅ Allow all fields if "*"
 
-    const departments = await Department.findAll({
-      attributes: fields.includes("*") ? undefined : fields, // ✅ Fix SQL syntax error
-      where: whereClause,
-    });
+    const departments = await Department.findAll({ attributes });
 
-    console.log("✅ Departments fetched:", departments.length);
+    console.log(`✅ Fetched ${departments.length} departments.`);
     res.json({ departments });
   } catch (error) {
     console.error("🔥 Error fetching departments:", error);
     res.status(500).json({ message: "Error fetching departments", error: error.message });
   }
 };
+
+
 
 
 exports.getDepartmentById = async (req, res) => {

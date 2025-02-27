@@ -10,65 +10,37 @@ const checkTableExists = async (tableName) => {
     return false;
   }
 };
-const getFieldPermissions = async (userId) => {
+const getFieldPermissions = async (userId, resource, action) => {
   try {
     let roleIds = new Set();
-    let permissionsByResource = {};
+    let fields = new Set();
+    let scopes = new Set();
+    let actions = new Set();
 
-    // Fetch global roles
-    const userRoles = await UserRole.findAll({ where: { userId }, include: [{ model: Role }] });
+    // Fetch roles assigned to user
+    const userRoles = await UserRole.findAll({ where: { userId } });
     userRoles.forEach((ur) => roleIds.add(ur.roleId));
 
-    // Fetch entity-specific roles
-    const entityRoles = await EntityRoleAssignment.findAll({ where: { userId }, include: [{ model: Role }] });
-    entityRoles.forEach((er) => roleIds.add(er.roleId));
-
+    // Fetch permissions based on role
     if (roleIds.size > 0) {
-      const rolePermissions = await RolePermission.findAll({ where: { roleId: [...roleIds] } });
+      const rolePermissions = await RolePermission.findAll({ where: { roleId: [...roleIds], resource, action } });
 
       for (const perm of rolePermissions || []) {
-        if (!permissionsByResource[perm.resource]) {
-          permissionsByResource[perm.resource] = { fields: new Set(["id"]), scopes: new Set(), actions: new Set() };
-        }
-
         if (perm.fields) {
           if (perm.fields === "*") {
-            permissionsByResource[perm.resource].fields.add("*"); // ✅ Allow all fields
+            fields.add("*");
           } else {
-            perm.fields.split(",").forEach((field) => permissionsByResource[perm.resource].fields.add(field));
+            perm.fields.split(",").forEach((field) => fields.add(field));
           }
         }
-
-        permissionsByResource[perm.resource].scopes.add(perm.scope);
-        permissionsByResource[perm.resource].actions.add(perm.action);
+        scopes.add(perm.scope);
+        actions.add(perm.action);
       }
     }
 
-    // ✅ Ensure Superadmin gets full access
-    if (roleIds.has(5)) { // Assuming roleId=5 is Superadmin
-      Object.keys(permissionsByResource).forEach((resource) => {
-        permissionsByResource[resource].scopes.add("all");
-        permissionsByResource[resource].actions.add("read");
-        permissionsByResource[resource].actions.add("create");
-        permissionsByResource[resource].actions.add("update");
-        permissionsByResource[resource].actions.add("delete");
-        permissionsByResource[resource].fields.add("*");
-      });
-    }
+    console.log(`✅ Permissions for ${resource}:`, { fields: Array.from(fields), scopes: Array.from(scopes), actions: Array.from(actions) });
 
-    // Convert sets to arrays for final response
-    Object.keys(permissionsByResource).forEach((resource) => {
-      permissionsByResource[resource].fields = Array.from(permissionsByResource[resource].fields || []);
-      permissionsByResource[resource].scopes = Array.from(permissionsByResource[resource].scopes || []);
-      permissionsByResource[resource].actions = Array.from(permissionsByResource[resource].actions || []);
-    });
-
-    if (Object.keys(permissionsByResource).length === 0) {
-      return { fields: [], scopes: [], actions: [] }; // ✅ Ensure empty permissions return an array
-    }
-
-    console.log("✅ Processed Permissions:", JSON.stringify(permissionsByResource, null, 2));
-    return permissionsByResource;
+    return { fields: Array.from(fields), scopes: Array.from(scopes), actions: Array.from(actions) };
   } catch (error) {
     console.error("🔥 Error fetching permissions:", error);
     return { fields: [], scopes: [], actions: [] };
@@ -76,4 +48,7 @@ const getFieldPermissions = async (userId) => {
 };
 
 
+
+
 module.exports = { getFieldPermissions };
+  

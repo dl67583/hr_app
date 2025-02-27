@@ -4,8 +4,9 @@ import NotFound from "./pages/NotFound";
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import UsersPage from "./pages/UsersPage";
+import RolesPage from "./pages/RolesPage";
 import Navbar from "./components/Navbar"; 
-
+import DepartmentsPage from "./pages/DepartentsPage";
 function App() {
   return (
     <>
@@ -15,6 +16,8 @@ function App() {
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/users" element={<UsersPage />} />
+          <Route path="/roles" element={<RolesPage />} />
+          <Route path="/departments" element={<DepartmentsPage />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
