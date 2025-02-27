@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
 
       const decoded = jwtDecode(data.accessToken);
       setUser(decoded);
-      fetchUserRolesAndPermissions(decoded.id);
+      fetchUserRolesAndPermissions(decoded.id, data.accessToken);
 
       navigate("/dashboard");
     } catch (error) {
@@ -40,10 +40,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const fetchUserRolesAndPermissions = async (userId) => {
+  const fetchUserRolesAndPermissions = async (userId, accessToken) => {
     try {
       const { data } = await axios.get(`http://localhost:5000/api/users/${userId}/roles-permissions`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${accessToken || token}` },
       });
       setRoles(data.roles || []);
       setPermissions(data.permissions || []);
@@ -51,6 +51,20 @@ export const AuthProvider = ({ children }) => {
       console.error("❌ Error fetching user roles and permissions:", error);
     }
   };
+
+  // ✅ Restore user from token on page refresh
+  useEffect(() => {
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setUser(decoded);
+        fetchUserRolesAndPermissions(decoded.id, token);
+      } catch (error) {
+        console.error("❌ Invalid token. Logging out...");
+        logout();
+      }
+    }
+  }, [token, logout]);
 
   return (
     <AuthContext.Provider value={{ user, token, login, logout, roles, permissions }}>
