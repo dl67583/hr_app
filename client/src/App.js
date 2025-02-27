@@ -7,6 +7,7 @@ import UsersPage from "./pages/UsersPage";
 import RolesPage from "./pages/RolesPage";
 import Navbar from "./components/Navbar"; 
 import DepartmentsPage from "./pages/DepartentsPage";
+import RequestsPage from "./pages/Requests";
 function App() {
   return (
     <>
@@ -18,6 +19,7 @@ function App() {
           <Route path="/users" element={<UsersPage />} />
           <Route path="/roles" element={<RolesPage />} />
           <Route path="/departments" element={<DepartmentsPage />} />
+          <Route path="/requests" element={<RequestsPage />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
