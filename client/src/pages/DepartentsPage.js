@@ -27,7 +27,10 @@ const fetchDepartments = async (token) => {
     });
     return data.departments || [];
   } catch (error) {
-    console.error("Error fetching departments:", error.response?.data || error.message);
+    console.error(
+      "Error fetching departments:",
+      error.response?.data || error.message
+    );
     return [];
   }
 };
@@ -40,19 +43,25 @@ const DepartmentsPage = () => {
   const [newDepartment, setNewDepartment] = useState({ name: "" });
 
   // Query for departments
-  const { data: departmentsData = [], isLoading, error } = useQuery(
-    ["departments"],
-    () => fetchDepartments(token),
-    { enabled: !!token }
-  );
+  const {
+    data: departmentsData = [],
+    isLoading,
+    error,
+  } = useQuery(["departments"], () => fetchDepartments(token), {
+    enabled: !!token,
+  });
 
   // Mutation for creating/updating a department
   const mutation = useMutation(
     async (deptData) => {
       if (editDepartment) {
-        return axios.put(`${API_BASE_URL}/api/departments/${editDepartment.id}`, deptData, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        return axios.put(
+          `${API_BASE_URL}/api/departments/${editDepartment.id}`,
+          deptData,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
       } else {
         return axios.post(`${API_BASE_URL}/api/departments`, deptData, {
           headers: { Authorization: `Bearer ${token}` },
@@ -100,66 +109,77 @@ const DepartmentsPage = () => {
 
   return (
     <div>
-      <h2>Departments</h2>
-      {userPermissions.includes("Departments:create") && (
-        <Button variant="contained" color="primary" onClick={() => handleOpen()}>
-          Add Department
-        </Button>
-      )}
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>ID</TableCell>
-            <TableCell>Name</TableCell>
-            {(userPermissions.includes("Departments:update") ||
-              userPermissions.includes("Departments:delete")) && (
-              <TableCell>Actions</TableCell>
-            )}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {departmentsData.map((dept) => (
-            <TableRow key={dept.id}>
-              <TableCell>{dept.id}</TableCell>
-              <TableCell>{dept.name}</TableCell>
+      <div className="bg-white border border-[#c5c6c7] h-[calc(100vh-123px)] p-6 rounded-lg">
+        <h2>Departments</h2>
+        {userPermissions.includes("Departments:create") && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleOpen()}
+          >
+            Add Department
+          </Button>
+        )}
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>ID</TableCell>
+              <TableCell>Name</TableCell>
               {(userPermissions.includes("Departments:update") ||
                 userPermissions.includes("Departments:delete")) && (
-                <TableCell>
-                  {userPermissions.includes("Departments:update") && (
-                    <Button onClick={() => handleOpen(dept)} color="primary">
-                      Edit
-                    </Button>
-                  )}
-                  {userPermissions.includes("Departments:delete") && (
-                    <Button onClick={() => deleteDepartment.mutate(dept.id)} color="secondary">
-                      Delete
-                    </Button>
-                  )}
-                </TableCell>
+                <TableCell>Actions</TableCell>
               )}
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHead>
+          <TableBody>
+            {departmentsData.map((dept) => (
+              <TableRow key={dept.id}>
+                <TableCell>{dept.id}</TableCell>
+                <TableCell>{dept.name}</TableCell>
+                {(userPermissions.includes("Departments:update") ||
+                  userPermissions.includes("Departments:delete")) && (
+                  <TableCell>
+                    {userPermissions.includes("Departments:update") && (
+                      <Button onClick={() => handleOpen(dept)} color="primary">
+                        Edit
+                      </Button>
+                    )}
+                    {userPermissions.includes("Departments:delete") && (
+                      <Button
+                        onClick={() => deleteDepartment.mutate(dept.id)}
+                        color="secondary"
+                      >
+                        Delete
+                      </Button>
+                    )}
+                  </TableCell>
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
 
-      <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>{editDepartment ? "Edit Department" : "Add Department"}</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Department Name"
-            name="name"
-            fullWidth
-            value={newDepartment.name}
-            onChange={handleChange}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
-          <Button color="primary" onClick={handleSubmit}>
-            {editDepartment ? "Update" : "Create"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        <Dialog open={open} onClose={() => setOpen(false)}>
+          <DialogTitle>
+            {editDepartment ? "Edit Department" : "Add Department"}
+          </DialogTitle>
+          <DialogContent>
+            <TextField
+              label="Department Name"
+              name="name"
+              fullWidth
+              value={newDepartment.name}
+              onChange={handleChange}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpen(false)}>Cancel</Button>
+            <Button color="primary" onClick={handleSubmit}>
+              {editDepartment ? "Update" : "Create"}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
     </div>
   );
 };

@@ -1,12 +1,6 @@
 import { useContext, useState, useEffect } from "react";
 import AuthContext from "../context/AuthContext";
-import {
-  AppBar,
-  Toolbar,
-  Button,
-  Typography,
-  CircularProgress,
-} from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -68,31 +62,22 @@ const Navbar = () => {
   if (loading) return <CircularProgress />;
 
   return (
-    <AppBar position="static">
-      <Toolbar>
-        <Typography variant="h6" style={{ flexGrow: 1 }}>
-          HR Management
-        </Typography>
-        {user ? (
-          <>
-            <Button color="inherit" onClick={() => navigate("/dashboard")}>
-              Dashboard
-            </Button>
-            {/* ✅ Check-In / Check-Out Button (No Role or Permission Checks) */}
-            <Button color="inherit" onClick={handleCheckInOut}>
-              {isCheckedIn ? "Check Out" : "Check In"}
-            </Button>
-            <Button color="inherit" onClick={logout}>
-              Logout
-            </Button>
-          </>
-        ) : (
-          <Button color="inherit" onClick={() => navigate("/login")}>
-            Login
+    <div className="fixed top-4 right-5 bg-white border border-[#c5c6c7] p-4 rounded-lg flex gap-4">
+      {user ? (
+        <>
+          <Button variant="contained" onClick={handleCheckInOut}>
+            {isCheckedIn ? "Check Out" : "Check In"}
           </Button>
-        )}
-      </Toolbar>
-    </AppBar>
+          <Button variant="contained" color="error" onClick={logout}>
+            Logout
+          </Button>
+        </>
+      ) : (
+        <Button variant="contained" onClick={() => navigate("/login")}>
+          Login
+        </Button>
+      )}
+    </div>
   );
 };
 
