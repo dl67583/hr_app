@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "react-query";
 import axios from "axios";
 import { useContext, useState } from "react";
 import AuthContext from "../context/AuthContext";
+import showAlert from "../components/showAlert";
 import {
   Table,
   TableRow,
@@ -29,6 +30,8 @@ const fetchRequests = async (token) => {
     return data.requests || [];
   } catch (error) {
     console.error("Error fetching requests:", error.response?.data || error.message);
+    showAlert("Error!",` ${error.response?.data?.message || error.message}`, "error");
+
     return [];
   }
 };
@@ -72,7 +75,7 @@ const RequestsPage = () => {
         },
         onError: (error) => {
           console.error("❌ Error creating or updating request:", error.response?.data || error.message);
-          alert(`Error: ${error.response?.data?.message || error.message}`);
+          showAlert("Error!",` ${error.response?.data?.message || error.message}`, "error");
         },
       }
     );

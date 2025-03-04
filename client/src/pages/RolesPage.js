@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "react-query";
 import axios from "axios";
 import { useContext, useState, useEffect } from "react";
 import AuthContext from "../context/AuthContext";
+import showAlert from "../components/showAlert";
 import {
   Table,
   TableRow,
@@ -268,8 +269,10 @@ function EditRoleDialog({ roleData, setRoleData, availablePermissions, token, qu
       queryClient.invalidateQueries("roles");
   
       onClose();
-    } catch (err) {
-      console.error("🔥 Error saving permissions:", err.response?.data || err.message);
+    } catch (error) {
+      console.error("🔥 Error saving permissions:", error.response?.data || error.message);
+      showAlert("Error!",` ${error.response?.data?.message || error.message}`, "error");
+
     }
   };
   

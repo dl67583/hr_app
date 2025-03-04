@@ -57,7 +57,7 @@ const getFieldPermissions = async (userId, resource, action) => {
     return { fields: [], scopes: [], actions: [] };
   }
 };
-
+  
 
 
 module.exports = { getFieldPermissions };

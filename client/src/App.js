@@ -9,6 +9,7 @@ import DepartmentsPage from "./pages/DepartentsPage";
 import RequestsPage from "./pages/Requests";
 import Layout from "./components/Layout";
 import Navbar from "./components/Navbar";
+import LeavesPage from "./pages/LeavesPage"
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
             <Route path="/roles" element={<RolesPage />} />
             <Route path="/departments" element={<DepartmentsPage />} />
             <Route path="/requests" element={<RequestsPage />} />
+            <Route path="/leaves" element={<LeavesPage />} />
           </Route>
         </Route>
         <Route path="*" element={<NotFound />} />

@@ -9,46 +9,83 @@ const API_BASE_URL = "http://localhost:5000";
 const Navbar = () => {
   const { user, logout, token } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [isCheckedIn, setIsCheckedIn] = useState(false);
+  const [isCheckedIn, setIsCheckedIn] = useState(null);
   const [checkInTime, setCheckInTime] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [clock, setClock] = useState(null);
+  const [elapsedTime, setElapsedTime] = useState("");
 
+  // ✅ Wait for user data before fetching check-in status
   useEffect(() => {
-    if (token && user) {
+    if (token && user?.id) {
       checkCurrentStatus();
     }
-  }, [token, user]);
+  }, [user]); // Only run when `user` is set
 
   useEffect(() => {
-    // If checked in, start the ticking clock
     let intervalId;
 
-    if (isCheckedIn) {
+    if (isCheckedIn && checkInTime) {
       intervalId = setInterval(() => {
-        setClock(new Date()); // Update the clock every second
+        const now = new Date();
+        const checkInDate = new Date(checkInTime);
+        const diff = Math.floor((now - checkInDate) / 1000);
+
+        const hours = String(Math.floor(diff / 3600)).padStart(2, "0");
+        const minutes = String(Math.floor((diff % 3600) / 60)).padStart(2, "0");
+        const seconds = String(diff % 60).padStart(2, "0");
+
+        setElapsedTime(`${hours}:${minutes}:${seconds}`);
       }, 1000);
     } else {
-      // Clear the clock when checking out
       clearInterval(intervalId);
+      setElapsedTime("");
     }
 
-    return () => {
-      clearInterval(intervalId); // Clean up the interval when component unmounts
-    };
-  }, [isCheckedIn]);
+    return () => clearInterval(intervalId);
+  }, [isCheckedIn, checkInTime]);
 
+  const handleCheckInOut = async () => {
+    try {
+      setLoading(true); // Show empty button text while processing
+
+      const url = isCheckedIn
+        ? `${API_BASE_URL}/api/time-attendance/checkout`
+        : `${API_BASE_URL}/api/time-attendance/checkin`;
+
+      const response = await axios.post(
+        url,
+        { userId: user.id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (!isCheckedIn) {
+        setIsCheckedIn(true);
+        setCheckInTime(new Date().toISOString()); // Store check-in time
+      } else {
+        setIsCheckedIn(false);
+        setCheckInTime(null);
+        setElapsedTime("");
+      }
+    } catch (error) {
+      console.error("❌ Error processing attendance:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   const checkCurrentStatus = async () => {
     try {
       const response = await axios.get(
         `${API_BASE_URL}/api/time-attendance/status/${user.id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      setIsCheckedIn(response.data.isCheckedIn || false);
-      if (response.data.checkInTime) {
-        setCheckInTime(new Date(response.data.checkInTime));
+
+      if (response.data.isCheckedIn) {
+        setIsCheckedIn(true);
+        setCheckInTime(response.data.checkInTime);
+      } else {
+        setIsCheckedIn(false);
+        setCheckInTime(null);
+        setElapsedTime("");
       }
     } catch (error) {
       console.error("❌ Error fetching attendance status:", error);
@@ -57,60 +94,24 @@ const Navbar = () => {
     }
   };
 
-  const handleCheckInOut = async () => {
-    try {
-      const url = isCheckedIn
-        ? `${API_BASE_URL}/api/time-attendance/checkout`
-        : `${API_BASE_URL}/api/time-attendance/checkin`;
-
-      const response = await axios.post(
-        url,
-        { userId: user.id },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      setIsCheckedIn(!isCheckedIn);
-      if (!isCheckedIn) {
-        // When checked in, set the current time
-        setCheckInTime(new Date());
-        setClock(new Date()); // Start the clock immediately
-      } else {
-        setClock(null); // Stop the clock when checked out
-      }
-    } catch (error) {
-      console.error("❌ Error processing attendance:", error);
-    }
-  };
-
-  if (loading) return <CircularProgress />;
+  if (!user) return null; // Prevent rendering if user isn't loaded
 
   return (
     <div className="fixed top-4 right-5 bg-white border border-[#c5c6c7] p-4 rounded-lg flex justify-between items-center w-[90%] max-w-[1200px]">
       <div className="flex items-center gap-4">
-        {user && (
-          <span className="text-black font-bold">{`Welcome, ${user.email}`}</span>
-        )}
+        {user && <span className="text-black font-bold">{`Welcome, ${user.email}`}</span>}
       </div>
 
       <div className="flex items-center gap-4">
         {user ? (
           <>
-            {isCheckedIn && clock && (
-              <div className="text-gray-500 text-sm flex items-center gap-2">
-                <p>Checked in at: {checkInTime && checkInTime.toLocaleTimeString()}</p>
-                <p>Current Time: {clock && clock.toLocaleTimeString()}</p>
-              </div>
-            )}
-
             <button
               onClick={handleCheckInOut}
-              className={`px-6 py-2 rounded-lg text-white font-semibold transition duration-300 ${
-                isCheckedIn ? "bg-blue-600 hover:bg-blue-700" : "bg-green-600 hover:bg-green-700"
+              className={`px-6 py-2 w-[120px] h-[40px] rounded-lg text-white font-semibold transition duration-300 ${
+                isCheckedIn === null ? "opacity-0" : isCheckedIn ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"
               }`}
             >
-              {isCheckedIn ? "Check Out" : "Check In"}
+              {isCheckedIn === null ? "⏳" : isCheckedIn ? elapsedTime : "Check In"}
             </button>
 
             <button

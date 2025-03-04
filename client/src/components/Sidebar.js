@@ -29,6 +29,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
     { name: "Users", path: "/users", icon: <FaUsers /> },
     { name: "Roles", path: "/roles", icon: <FaUserShield /> },
     { name: "Requests", path: "/requests", icon: <FaClipboardList /> },
+    { name: "Leaves", path: "/leaves", icon: <FaClipboardList /> },
   ];
 
   return (
