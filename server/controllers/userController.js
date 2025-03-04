@@ -7,10 +7,10 @@ exports.getAllUsers = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized: User not authenticated" });
     }
 
-    console.log("🔍 Fetching users for user ID:", req.user.id);
+    // console.log("🔍 Fetching users for user ID:", req.user.id);
 
     const { fields = [], scopes = [] } = await getFieldPermissions(req.user.id, "Users", "read");
-
+    // console.log(fields, scopes)
     if (!Array.isArray(fields) || fields.length === 0) {
       return res.status(403).json({ message: "Access Denied" });
     }
@@ -189,7 +189,6 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
-
 exports.getUserPermissions = async (req, res) => {
   try {
     if (!req.user || !req.user.id) {
@@ -198,8 +197,10 @@ exports.getUserPermissions = async (req, res) => {
 
     console.log("🔍 Fetching all permissions for user ID:", req.user.id);
 
-    const permissions = await getFieldPermissions(req.user.id);
+    // ✅ Ensure we pass a valid resource and action
+    const permissions = await getFieldPermissions(req.user.id, "Users", "read");
 
+    console.log("🔍 Final API Response:", JSON.stringify(permissions));
     res.json(permissions);
   } catch (error) {
     console.error("🔥 Error fetching user permissions:", error);

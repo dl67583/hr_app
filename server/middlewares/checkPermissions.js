@@ -12,6 +12,10 @@ const checkTableExists = async (tableName) => {
 };
 const getFieldPermissions = async (userId, resource, action) => {
   try {
+    if (!userId || !resource || !action) {
+      throw new Error(`Missing required parameters: userId=${userId}, resource=${resource}, action=${action}`);
+    }
+
     let roleIds = new Set();
     let fields = new Set();
     let scopes = new Set();
@@ -19,11 +23,14 @@ const getFieldPermissions = async (userId, resource, action) => {
 
     // Fetch roles assigned to user
     const userRoles = await UserRole.findAll({ where: { userId } });
+    console.log("User Roles:", userRoles);
+
     userRoles.forEach((ur) => roleIds.add(ur.roleId));
 
     // Fetch permissions based on role
     if (roleIds.size > 0) {
       const rolePermissions = await RolePermission.findAll({ where: { roleId: [...roleIds], resource, action } });
+      console.log("Role Permissions:", rolePermissions);
 
       for (const perm of rolePermissions || []) {
         if (perm.fields) {
@@ -38,15 +45,18 @@ const getFieldPermissions = async (userId, resource, action) => {
       }
     }
 
-    console.log(`✅ Permissions for ${resource}:`, { fields: Array.from(fields), scopes: Array.from(scopes), actions: Array.from(actions) });
-
+    console.log("🔍 Before return:", {
+      fields: Array.from(fields),
+      scopes: Array.from(scopes),
+      actions: Array.from(actions),
+    });
     return { fields: Array.from(fields), scopes: Array.from(scopes), actions: Array.from(actions) };
+    
   } catch (error) {
     console.error("🔥 Error fetching permissions:", error);
     return { fields: [], scopes: [], actions: [] };
   }
 };
-
 
 
 

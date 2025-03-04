@@ -123,7 +123,7 @@ const UsersPage = () => {
         .then(({ data }) => {
           console.log(
             "🔍 Permissions API Response:",
-            JSON.stringify(data, null, 2)
+            JSON.stringify(data)
           );
 
           const userPermissions = data.Users || {}; // ✅ Ensure permissions exist

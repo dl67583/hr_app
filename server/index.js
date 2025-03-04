@@ -30,7 +30,7 @@ const requestRoutes = require("./routes/requestRoutes");
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/roles", roleRoutes);
-app.use("/api/permissions", rolePermissionRoutes);
+app.use("/api/rolePermissions", rolePermissionRoutes);
 app.use("/api/user-roles", userRoleRoutes);
 app.use("/api/entity-roles", entityRoleAssignmentRoutes);
 app.use("/api/departments", departmentRoutes);
