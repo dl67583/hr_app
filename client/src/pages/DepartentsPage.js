@@ -36,20 +36,18 @@ const fetchDepartments = async (token) => {
 };
 
 const DepartmentsPage = () => {
-  const { token, permissions: userPermissions = [] } = useContext(AuthContext);
+  const { token, user } = useContext(AuthContext);
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editDepartment, setEditDepartment] = useState(null);
   const [newDepartment, setNewDepartment] = useState({ name: "" });
 
   // Query for departments
-  const {
-    data: departmentsData = [],
-    isLoading,
-    error,
-  } = useQuery(["departments"], () => fetchDepartments(token), {
-    enabled: !!token,
-  });
+  const { data: departmentsData = [], isLoading, error } = useQuery(
+    ["departments"],
+    () => fetchDepartments(token),
+    { enabled: !!token }
+  );
 
   // Mutation for creating/updating a department
   const mutation = useMutation(
@@ -74,6 +72,13 @@ const DepartmentsPage = () => {
         setOpen(false);
         setEditDepartment(null);
         setNewDepartment({ name: "" });
+      },
+      onError: (error) => {
+        console.error(
+          "❌ Error creating or updating department:",
+          error.response?.data || error.message
+        );
+        alert(`Error: ${error.response?.data?.message || error.message}`);
       },
     }
   );
@@ -108,78 +113,68 @@ const DepartmentsPage = () => {
   if (error) return <p>Error loading departments: {error.message}</p>;
 
   return (
-    <div>
-      <div className="bg-white border border-[#c5c6c7] h-[calc(100vh-123px)] p-6 rounded-lg">
-        <h2>Departments</h2>
-        {userPermissions.includes("Departments:create") && (
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => handleOpen()}
-          >
-            Add Department
-          </Button>
-        )}
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Name</TableCell>
-              {(userPermissions.includes("Departments:update") ||
-                userPermissions.includes("Departments:delete")) && (
-                <TableCell>Actions</TableCell>
-              )}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {departmentsData.map((dept) => (
-              <TableRow key={dept.id}>
-                <TableCell>{dept.id}</TableCell>
-                <TableCell>{dept.name}</TableCell>
-                {(userPermissions.includes("Departments:update") ||
-                  userPermissions.includes("Departments:delete")) && (
-                  <TableCell>
-                    {userPermissions.includes("Departments:update") && (
-                      <Button onClick={() => handleOpen(dept)} color="primary">
-                        Edit
-                      </Button>
-                    )}
-                    {userPermissions.includes("Departments:delete") && (
-                      <Button
-                        onClick={() => deleteDepartment.mutate(dept.id)}
-                        color="secondary"
-                      >
-                        Delete
-                      </Button>
-                    )}
-                  </TableCell>
-                )}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+    <div className="bg-white border border-[#c5c6c7] h-[calc(100vh-123px)] p-6 rounded-lg">
+      <h2>Departments</h2>
 
-        <Dialog open={open} onClose={() => setOpen(false)}>
-          <DialogTitle>
-            {editDepartment ? "Edit Department" : "Add Department"}
-          </DialogTitle>
-          <DialogContent>
-            <TextField
-              label="Department Name"
-              name="name"
-              fullWidth
-              value={newDepartment.name}
-              onChange={handleChange}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setOpen(false)}>Cancel</Button>
-            <Button color="primary" onClick={handleSubmit}>
-              {editDepartment ? "Update" : "Create"}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
+      {/* Button to open the modal for adding a new department */}
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => handleOpen()}
+      >
+        Add Department
+      </Button>
+
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>ID</TableCell>
+            <TableCell>Name</TableCell>
+            <TableCell>Actions</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {departmentsData.map((dept) => (
+            <TableRow key={dept.id}>
+              <TableCell>{dept.id}</TableCell>
+              <TableCell>{dept.name}</TableCell>
+              <TableCell>
+                <Button onClick={() => handleOpen(dept)} color="primary">
+                  Edit
+                </Button>
+                <Button
+                  onClick={() => deleteDepartment.mutate(dept.id)}
+                  color="secondary"
+                >
+                  Delete
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      {/* Modal for creating/editing a department */}
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogTitle>
+          {editDepartment ? "Edit Department" : "Add Department"}
+        </DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Department Name"
+            name="name"
+            fullWidth
+            value={newDepartment.name}
+            onChange={handleChange}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)}>Cancel</Button>
+          <Button color="primary" onClick={handleSubmit}>
+            {editDepartment ? "Update" : "Create"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
