@@ -1,4 +1,6 @@
-const { TimeAttendance } = require("../models");
+
+const { TimeAttendance, User } = require("../models");
+const { Op } = require("sequelize");
 const { getFieldPermissions } = require("../middlewares/checkPermissions");
 
 exports.getAllTimeAttendanceRecords = async (req, res) => {
@@ -147,16 +149,18 @@ exports.getAttendanceStatus = async (req, res) => {
       where: { userId, checkOut: null },
     });
 
-    res.json({ isCheckedIn: !!existingRecord });
+    res.json({ 
+      isCheckedIn: !!existingRecord, 
+      checkInTime: existingRecord ? existingRecord.checkIn.toISOString() : null 
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Error fetching attendance status",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Error fetching attendance status",
+      error: error.message,
+    });
   }
 };
+
 
 exports.checkIn = async (req, res) => {
   try {
@@ -200,5 +204,31 @@ exports.checkOut = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error checking out", error: error.message });
+  }
+};
+
+exports.getDepartmentMembersAtWork = async (req, res) => {
+  try {
+    const { departmentId } = req.query;
+    const today = new Date();
+    
+    const activeUsers = await TimeAttendance.findAll({
+      where: {
+        checkIn: {
+          [Op.gte]: new Date(today.setHours(0, 0, 0, 0)), // Only today's records
+        },
+        checkOut: null, // Not checked out yet
+      },
+      include: {
+        model: User,
+        where: { departmentId },
+        attributes: ["id", "name", "surname"],
+      },
+    });
+
+    const usersAtWork = activeUsers.map(record => record.User);
+    res.json(usersAtWork);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching attendance records", error });
   }
 };

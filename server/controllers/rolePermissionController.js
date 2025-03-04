@@ -2,12 +2,15 @@ const { RolePermission } = require("../models");
 
 exports.getAllRolePermissions = async (req, res) => {
   try {
-    const permissions = await RolePermission.findAll();
-    res.json({ permissions });
+    const rolePermissions = await RolePermission.findAll();
+    console.log("🔍 All Role Permissions:", rolePermissions);
+    
+    res.json({ permissions: rolePermissions });
   } catch (error) {
     res.status(500).json({ message: "Error fetching role permissions", error: error.message });
   }
 };
+
 
 exports.getRolePermissionById = async (req, res) => {
   try {

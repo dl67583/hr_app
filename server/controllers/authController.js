@@ -6,6 +6,7 @@ require("dotenv").config();
 
 /** Generate JWT Access Token */
 const generateAccessToken = (user) => {
+  
   return jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: "15m" });
 };
 
@@ -38,10 +39,9 @@ exports.registerUser = async (req, res) => {
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    
+
     console.log("🔍 Login request received:", email);
 
-    // Check if user exists
     const user = await User.findOne({ where: { email } });
     if (!user) {
       console.error("❌ User not found");
@@ -50,48 +50,58 @@ exports.loginUser = async (req, res) => {
 
     console.log("✅ User found:", user.email);
 
-    // Compare hashed passwords
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       console.error("❌ Password mismatch");
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    console.log("🔑 Password matched, generating token");
+    console.log("🔑 Password matched, generating tokens");
 
-    const accessToken = jwt.sign(
-      { id: user.id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" } // ✅ Extend token expiration to 1 hour
-    );
-    
-    console.log("✅ Token generated successfully");
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
 
-    res.json({ accessToken });
+    // ✅ Store the refresh token in the database
+    await User.update({ refreshToken }, { where: { id: user.id } });
+
+    console.log("✅ Tokens generated successfully");
+
+    res.json({ accessToken, refreshToken }); // ✅ Send both tokens to client
   } catch (error) {
     console.error("🔥 Login error:", error);
     res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
 
+
 /** Refresh Access Token */
 exports.refreshToken = async (req, res) => {
   try {
     const { refreshToken } = req.body;
+
     if (!refreshToken) return res.status(401).json({ message: "No refresh token provided" });
 
-    const user = await User.findOne({ where: { refreshToken } });
-    if (!user) return res.status(403).json({ message: "Invalid refresh token" });
-
-    // Verify refresh token
-    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, (err, decoded) => {
+    // Verify the token
+    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, async (err, decoded) => {
       if (err) return res.status(403).json({ message: "Invalid refresh token" });
 
-      // Generate new access token
+      const user = await User.findByPk(decoded.id);
+
+      if (!user || user.refreshToken !== refreshToken) {
+        return res.status(403).json({ message: "Invalid refresh token" });
+      }
+
+      // Generate new tokens
       const newAccessToken = generateAccessToken(user);
-      res.json({ accessToken: newAccessToken });
+      const newRefreshToken = generateRefreshToken(user);
+
+      // ✅ Update refresh token in database
+      await User.update({ refreshToken: newRefreshToken }, { where: { id: user.id } });
+
+      res.json({ accessToken: newAccessToken, refreshToken: newRefreshToken });
     });
   } catch (error) {
+    console.error("🔥 Error refreshing token:", error);
     res.status(500).json({ message: "Error refreshing token", error });
   }
 };
@@ -101,7 +111,7 @@ exports.logoutUser = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // Remove refresh token from database
+    // ✅ Remove refresh token from the database
     await User.update({ refreshToken: null }, { where: { id: userId } });
 
     res.json({ message: "Logged out successfully" });

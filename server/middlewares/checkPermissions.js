@@ -10,10 +10,11 @@ const checkTableExists = async (tableName) => {
     return false;
   }
 };
-const getFieldPermissions = async (userId, resource, action) => {
+
+const getFieldPermissions = async (userId, resource) => {
   try {
-    if (!userId || !resource || !action) {
-      throw new Error(`Missing required parameters: userId=${userId}, resource=${resource}, action=${action}`);
+    if (!userId || !resource) {
+      throw new Error(`Missing required parameters: userId=${userId}, resource=${resource}`);
     }
 
     let roleIds = new Set();
@@ -23,14 +24,17 @@ const getFieldPermissions = async (userId, resource, action) => {
 
     // Fetch roles assigned to user
     const userRoles = await UserRole.findAll({ where: { userId } });
-    console.log("User Roles:", userRoles);
 
     userRoles.forEach((ur) => roleIds.add(ur.roleId));
 
-    // Fetch permissions based on role
+    console.log("🛠️ User Role IDs:", [...roleIds]);
+
     if (roleIds.size > 0) {
-      const rolePermissions = await RolePermission.findAll({ where: { roleId: [...roleIds], resource, action } });
-      console.log("Role Permissions:", rolePermissions);
+      const rolePermissions = await RolePermission.findAll({
+        where: { roleId: [...roleIds], resource },
+      });
+
+      console.log("🔍 Role Permissions for resource:", resource, rolePermissions);
 
       for (const perm of rolePermissions || []) {
         if (perm.fields) {
@@ -45,19 +49,24 @@ const getFieldPermissions = async (userId, resource, action) => {
       }
     }
 
-    console.log("🔍 Before return:", {
+    console.log("✅ Final Permissions:", {
       fields: Array.from(fields),
       scopes: Array.from(scopes),
       actions: Array.from(actions),
     });
-    return { fields: Array.from(fields), scopes: Array.from(scopes), actions: Array.from(actions) };
-    
+
+    return {
+      fields: Array.from(fields),
+      scopes: Array.from(scopes),
+      actions: Array.from(actions),
+    };
   } catch (error) {
     console.error("🔥 Error fetching permissions:", error);
     return { fields: [], scopes: [], actions: [] };
   }
 };
-  
+
+
 
 
 module.exports = { getFieldPermissions };

@@ -10,5 +10,6 @@ router.get("/:id", authenticate, userController.getUserById);
 router.post("/", authenticate, userController.createUser);
 router.put("/:id", authenticate, userController.updateUser);
 router.delete("/:id", authenticate, userController.deleteUser);
+router.get("/birthdays/today", authenticate, userController.getBirthdaysToday);
 
 module.exports = router;

@@ -12,6 +12,8 @@ module.exports = (sequelize, DataTypes) => {
     hourlyPay: { type: DataTypes.STRING },
     refreshToken: { type: DataTypes.TEXT, allowNull: true },
     departmentId: { type: DataTypes.INTEGER, allowNull: true }, // ✅ Link users to a department
+    daysOff: { type: DataTypes.INTEGER, defaultValue: 0, allowNull: false }, // ✅ Track days off
+    sickDaysTaken: { type: DataTypes.INTEGER, defaultValue: 0, allowNull: false } // ✅ Track sick days
   });
 
   User.associate = (models) => {

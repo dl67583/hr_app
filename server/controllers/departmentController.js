@@ -3,39 +3,21 @@ const { getFieldPermissions } = require("../middlewares/checkPermissions");
 
 exports.getAllDepartments = async (req, res) => {
   try {
-    console.log("🔍 Fetching departments...");
-
-    if (!req.user || !req.user.id) {
-      return res.status(401).json({ message: "Unauthorized: User not authenticated" });
-    }
-
-    const { fields = [], scopes = [], actions = [] } = await getFieldPermissions(req.user.id, "Departments", "read");
-
-    console.log("✅ Permissions for Departments:", { fields, scopes, actions });
-
-    if (!actions.includes("read")) {
-      return res.status(403).json({ message: "Access Denied: Missing read permission" });
-    }
+    const { fields, actions } = await getFieldPermissions(req.user.id, "Departments", "read");
+    if (!actions.includes("read")) return res.status(403).json({ message: "Access Denied" });
 
     const attributes = fields.includes("*") ? undefined : fields; // ✅ Allow all fields if "*"
 
-    const departments = await Department.findAll({ attributes });
-
-    console.log(`✅ Fetched ${departments.length} departments.`);
-    res.json({ departments });
+    const departments = await Department.findAll({ attributes });    res.json({ departments });
   } catch (error) {
-    console.error("🔥 Error fetching departments:", error);
     res.status(500).json({ message: "Error fetching departments", error: error.message });
   }
 };
 
-
-
-
 exports.getDepartmentById = async (req, res) => {
   try {
-    const { fields } = await getFieldPermissions(req.user.role.id, "Departments", "read");
-    if (!fields.length) return res.status(403).json({ message: "Access Denied" });
+    const { fields, actions } = await getFieldPermissions(req.user.id, "Departments", "read");
+    if (!actions.includes("read")) return res.status(403).json({ message: "Access Denied" });
 
     const department = await Department.findByPk(req.params.id, { attributes: fields });
     if (!department) return res.status(404).json({ message: "Department not found" });
@@ -48,8 +30,8 @@ exports.getDepartmentById = async (req, res) => {
 
 exports.createDepartment = async (req, res) => {
   try {
-    const hasPermission = await getFieldPermissions(req.user.role.id, "Departments", "create");
-    if (!hasPermission.length) return res.status(403).json({ message: "Access Denied" });
+    const { actions } = await getFieldPermissions(req.user.id, "Departments", "create");
+    if (!actions.includes("create")) return res.status(403).json({ message: "Access Denied" });
 
     const department = await Department.create(req.body);
     res.status(201).json({ message: "Department created successfully", department });
@@ -60,15 +42,15 @@ exports.createDepartment = async (req, res) => {
 
 exports.updateDepartment = async (req, res) => {
   try {
-    const { fields } = await getFieldPermissions(req.user.role.id, "Departments", "update");
-    if (!fields.length) return res.status(403).json({ message: "Access Denied" });
+    const { fields, actions } = await getFieldPermissions(req.user.id, "Departments", "update");
+    if (!actions.includes("update")) return res.status(403).json({ message: "Access Denied" });
 
     const department = await Department.findByPk(req.params.id);
     if (!department) return res.status(404).json({ message: "Department not found" });
 
     const updatedData = {};
     Object.keys(req.body).forEach((key) => {
-      if (fields.includes(key)) updatedData[key] = req.body[key];
+      if (fields.includes("*") || fields.includes(key)) updatedData[key] = req.body[key];
     });
 
     await department.update(updatedData);
@@ -80,8 +62,8 @@ exports.updateDepartment = async (req, res) => {
 
 exports.deleteDepartment = async (req, res) => {
   try {
-    const hasPermission = await getFieldPermissions(req.user.role.id, "Departments", "delete");
-    if (!hasPermission.length) return res.status(403).json({ message: "Access Denied" });
+    const { actions } = await getFieldPermissions(req.user.id, "Departments", "delete");
+    if (!actions.includes("delete")) return res.status(403).json({ message: "Access Denied" });
 
     const department = await Department.findByPk(req.params.id);
     if (!department) return res.status(404).json({ message: "Department not found" });

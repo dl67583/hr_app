@@ -1,5 +1,7 @@
 const { User, UserRole, Role, RolePermission } = require("../models");
 const { getFieldPermissions } = require("../middlewares/checkPermissions");
+const { Op } = require("sequelize");
+
 const bcrypt = require("bcryptjs"); // ✅ Ensure bcrypt is imported
 exports.getAllUsers = async (req, res) => {
   try {
@@ -188,22 +190,49 @@ exports.deleteUser = async (req, res) => {
       .json({ message: "Error deleting user", error: error.message });
   }
 };
-
 exports.getUserPermissions = async (req, res) => {
   try {
+    console.log("🔍 Fetching permissions for user ID:", req.user?.id);
+
     if (!req.user || !req.user.id) {
-      return res.status(401).json({ message: "Unauthorized: User not authenticated" });
+      console.warn("❌ Unauthorized: No valid user found");
+      return res.status(401).json({ message: "Unauthorized: No valid token" });
     }
 
-    console.log("🔍 Fetching all permissions for user ID:", req.user.id);
+    // ✅ Fetch user's permissions
+    const permissions = await getFieldPermissions(req.user.id, "Users");
 
-    // ✅ Ensure we pass a valid resource and action
-    const permissions = await getFieldPermissions(req.user.id, "Users", "read");
+    if (!permissions.actions.length) {
+      console.warn("⚠️ User has no assigned permissions");
+      return res.status(403).json({ message: "No permissions found for user" });
+    }
 
-    console.log("🔍 Final API Response:", JSON.stringify(permissions));
+    console.log("✅ Permissions Fetched:", permissions);
     res.json(permissions);
   } catch (error) {
-    console.error("🔥 Error fetching user permissions:", error);
+    console.error("🔥 Error fetching permissions:", error);
     res.status(500).json({ message: "Error fetching user permissions", error: error.message });
+  }
+};
+
+
+
+exports.getBirthdaysToday = async (req, res) => {
+  try {
+    const today = new Date();
+    const formattedToday = today.toISOString().split("T")[0]; // YYYY-MM-DD format
+
+    const users = await User.findAll({
+      where: {
+        birthday: {
+          [Op.like]: `%${formattedToday.split("-").slice(1).join("-")}`, // Matches MM-DD
+        },
+      },
+      attributes: ["id", "name", "surname"],
+    });
+
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching birthdays", error });
   }
 };
