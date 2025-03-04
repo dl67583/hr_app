@@ -1,6 +1,6 @@
 import { useContext, useState, useEffect } from "react";
 import AuthContext from "../context/AuthContext";
-import { Button, CircularProgress } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -18,7 +18,6 @@ const Navbar = () => {
     }
   }, [token, user]);
 
-  // ✅ Check if the user is currently checked in
   const checkCurrentStatus = async () => {
     try {
       const response = await axios.get(
@@ -27,8 +26,6 @@ const Navbar = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
-      console.log("✅ Attendance Status Response:", response.data);
       setIsCheckedIn(response.data.isCheckedIn || false);
     } catch (error) {
       console.error("❌ Error fetching attendance status:", error);
@@ -37,7 +34,6 @@ const Navbar = () => {
     }
   };
 
-  // ✅ Check-In / Check-Out function
   const handleCheckInOut = async () => {
     try {
       const url = isCheckedIn
@@ -58,24 +54,35 @@ const Navbar = () => {
     }
   };
 
-  // ✅ Prevent rendering while loading data
   if (loading) return <CircularProgress />;
 
   return (
-    <div className="fixed top-4 right-5 bg-white border border-[#c5c6c7] p-4 rounded-lg flex gap-4">
+    <div className="fixed top-4 right-5 bg-white border border-[#c5c6c7] p-4 rounded-lg flex items-center gap-4">
       {user ? (
         <>
-          <Button variant="contained" onClick={handleCheckInOut}>
+          <span className="text-blue-600 font-bold">{user.email}</span>, welcome back!
+          <button
+            onClick={handleCheckInOut}
+            className={`px-6 py-2 rounded-lg text-white font-semibold transition duration-300 ${
+              isCheckedIn ? "bg-blue-600 hover:bg-blue-700" : "bg-green-600 hover:bg-green-700"
+            }`}
+          >
             {isCheckedIn ? "Check Out" : "Check In"}
-          </Button>
-          <Button variant="contained" color="error" onClick={logout}>
+          </button>
+          <button
+            onClick={logout}
+            className="px-6 py-2 bg-red-500 hover:bg-red-700 text-white rounded-lg font-semibold transition duration-300 border border-red-700"
+          >
             Logout
-          </Button>
+          </button>
         </>
       ) : (
-        <Button variant="contained" onClick={() => navigate("/login")}>
+        <button
+          onClick={() => navigate("/login")}
+          className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition duration-300"
+        >
           Login
-        </Button>
+        </button>
       )}
     </div>
   );

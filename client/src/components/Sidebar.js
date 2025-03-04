@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Typography } from "@mui/material";
 import {
   FaTachometerAlt,
@@ -11,6 +11,7 @@ import {
 
 const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [logoText, setLogoText] = useState("HR Management");
 
   useEffect(() => {
@@ -51,12 +52,12 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
       {menuItems.map((item, index) => (
         <button
           key={index}
-          className={`flex items-center w-full text-left mb-4 p-3 rounded-lg transition-all ${
-            isCollapsed ? "justify-center" : "hover:bg-gray-100"
-          } text-gray-600 font-medium`}
+          className={`flex items-center w-full text-left mb-4 p-3 rounded-lg transition-all font-medium ${
+            location.pathname === item.path ? "bg-blue-600 text-white" : "text-gray-600 hover:bg-gray-100"
+          } ${isCollapsed ? "justify-center" : ""}`}
           onClick={() => navigate(item.path)}
         >
-          <span className="text-gray-500 text-lg">{item.icon}</span>
+          <span className="text-lg">{item.icon}</span>
           {!isCollapsed && <span className="ml-3">{item.name}</span>}
         </button>
       ))}
