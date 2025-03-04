@@ -118,7 +118,7 @@ const RequestsPage = () => {
     if (error) return <p>Error loading requests: {error.message}</p>;
   
     return (
-      <div>
+      <div className="bg-white border border-[#c5c6c7] h-[calc(100vh-123px)] p-6 rounded-lg">
         <h2>Requests</h2>
   
         {/* Button to open the modal for adding a new request */}

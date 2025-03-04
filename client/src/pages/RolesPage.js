@@ -133,7 +133,7 @@ const RolesPage = () => {
   if (error) return <p>Error loading roles: {error.message}</p>;
 
   return (
-    <div>
+    <div className="bg-white border border-[#c5c6c7] h-[calc(100vh-123px)] p-6 rounded-lg">
       <h2>Roles</h2>
       <Button variant="contained" color="primary" onClick={() => handleOpenEdit()}>
         Add Role

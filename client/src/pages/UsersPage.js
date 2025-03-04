@@ -241,9 +241,8 @@ const UsersPage = () => {
   if (error) return <p>Error loading users: {error.message}</p>;
 
   return (
-    <div>
+    <div className="bg-white border border-[#c5c6c7] h-[calc(100vh-123px)] p-6 rounded-lg">
       <h2>Users</h2>
-
       {/* ✅ Show Add User button only if user has create permissions */}
       {allowedActions.includes("create") && (
         <Button
