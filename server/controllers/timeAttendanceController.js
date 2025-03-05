@@ -206,29 +206,52 @@ exports.checkOut = async (req, res) => {
       .json({ message: "Error checking out", error: error.message });
   }
 };
+// exports.getDepartmentMembersAtWork = async (req, res) => {
+//   try {
+//     console.log("🔍 Received departmentId:", req.query.departmentId);
 
-exports.getDepartmentMembersAtWork = async (req, res) => {
-  try {
-    const { departmentId } = req.query;
-    const today = new Date();
-    
-    const activeUsers = await TimeAttendance.findAll({
-      where: {
-        checkIn: {
-          [Op.gte]: new Date(today.setHours(0, 0, 0, 0)), // Only today's records
-        },
-        checkOut: null, // Not checked out yet
-      },
-      include: {
-        model: User,
-        where: { departmentId },
-        attributes: ["id", "name", "surname"],
-      },
-    });
+//     if (!req.query.departmentId) {
+//       return res.status(400).json({ message: "Missing departmentId in query params" });
+//     }
 
-    const usersAtWork = activeUsers.map(record => record.User);
-    res.json(usersAtWork);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching attendance records", error });
-  }
-};
+//     const { departmentId } = req.query;
+//     const today = new Date();
+
+//     console.log("📌 Fetching users at work for department:", departmentId);
+
+//     const activeUsers = await TimeAttendance.findAll({
+//       where: {
+//         checkIn: {
+//           [Op.gte]: new Date(today.setHours(0, 0, 0, 0)), // Fetch today's records
+//         },
+//         checkOut: null, // Not checked out yet
+//       },
+//       include: [
+//         {
+//           model: User,
+//           required: false, // 🛠 Set to false to prevent breaking if no user is found
+//           attributes: ["id", "name", "surname"],
+//           where: { departmentId: departmentId },
+//         },
+//       ],
+//     });
+
+//     console.log("✅ Raw query result:", JSON.stringify(activeUsers, null, 2));
+
+//     if (!activeUsers.length) {
+//       console.warn("⚠️ No active users found for departmentId:", departmentId);
+//       return res.json([]); // ✅ Prevents frontend errors
+//     }
+
+//     // ✅ Ensure `User` exists before accessing its properties
+//     const usersAtWork = activeUsers
+//       .filter(record => record.User) // 🛠 Only include valid User records
+//       .map(record => record.User);
+
+//     console.log("✅ Users currently at work:", JSON.stringify(usersAtWork, null, 2));
+//     res.json(usersAtWork);
+//   } catch (error) {
+//     console.error("🔥 Error fetching attendance records:", error);
+//     res.status(500).json({ message: "Error fetching attendance records", error: error.message });
+//   }
+// };

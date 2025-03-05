@@ -103,7 +103,7 @@ module.exports = {
 
     // 🔹 Employee: Limited permissions
     rolePermissions.push(
-      { roleId: roleMap["Employee"], resource: "Users", action: "read", fields: "id,name,email", scope: "own", createdAt: new Date(), updatedAt: new Date() },
+      { roleId: roleMap["Employee"], resource: "Users", action: "read", fields: "id,name,email,departmentId", scope: "own", createdAt: new Date(), updatedAt: new Date() },
       { roleId: roleMap["Employee"], resource: "Requests", action: "create", fields: "*", scope: "own", createdAt: new Date(), updatedAt: new Date() },
       { roleId: roleMap["Employee"], resource: "Leaves", action: "create", fields: "type,description", scope: "own", createdAt: new Date(), updatedAt: new Date() },
       { roleId: roleMap["Employee"], resource: "Leaves", action: "read", fields: "*", scope: "own", createdAt: new Date(), updatedAt: new Date() }

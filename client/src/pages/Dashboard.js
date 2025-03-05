@@ -18,16 +18,19 @@ const Dashboard = () => {
   const [daysOffSpent, setDaysOffSpent] = useState(0);
   const [sickDays, setSickDays] = useState(0);
   const [birthdaysToday, setBirthdaysToday] = useState([]);
-  const [departmentMembersAtWork, setDepartmentMembersAtWork] = useState([]);
 
   useEffect(() => {
-    if (user && user.id && permissions) {
+    if (user?.id && permissions && token) {
       console.log("✅ Fetching dashboard data for user ID:", user.id);
       fetchDashboardData(user.id);
+      console.log("✅ Fetched dashboard data for user ID:", user);
+
     } else {
-      console.warn("⚠️ User ID or permissions are undefined, waiting for update...");
+      console.warn("⚠️ User ID, permissions, or token undefined, waiting for update...");
     }
-  }, [user, permissions]);
+  }, [user?.id, permissions, token]); // ✅ Ensures re-fetching happens only when necessary
+  
+  const API_BASE_URL = "http://localhost:5000";
 
   const fetchDashboardData = async (userId) => {
     try {
@@ -35,34 +38,27 @@ const Dashboard = () => {
         console.warn("⚠️ No token found, skipping API requests.");
         return;
       }
-
+  
       const headers = { Authorization: `Bearer ${token}` };
-      const userRes = await axios.get(`/api/users/${userId}`, { headers });
-      setDaysOff(userRes.data.user.daysOff || 0);
-      setSickDays(userRes.data.user.sickDaysTaken || 0);
-
-      if (permissions.resources?.Leaves?.actions?.includes("read")) {
-        const leaveRes = await axios.get(`/api/leaves?userId=${userId}`, { headers });
-        setDaysOffSpent(leaveRes.data.length || 0);
-      }
-
-      if (permissions.resources?.Users?.scope === "all") {
-        const birthdayRes = await axios.get(`/api/users/birthdays/today`, { headers });
-        setBirthdaysToday(Array.isArray(birthdayRes.data) ? birthdayRes.data : []);
-      }
-
-      if (permissions.resources?.TimeAttendance?.scope === "department") {
-        const attendanceRes = await axios.get(
-          `/api/timeAttendance/atWork?departmentId=${userRes.data.user.departmentId}`,
-          { headers }
-        );
-        setDepartmentMembersAtWork(Array.isArray(attendanceRes.data) ? attendanceRes.data : []);
+  
+      console.log("🔍 Fetching user data...");
+      const userRes = await axios.get(`${API_BASE_URL}/api/users/${userId}`, { headers });
+  
+      if (userRes.data.user) {
+        console.log("✅ User API Response:", userRes.data);
+        setDaysOff(userRes.data.user.daysOff || 0);
+        setSickDays(userRes.data.user.sickDaysTaken || 0);
+      } else {
+        console.warn("⚠️ User data missing from response.");
+        setDaysOff(0);
+        setSickDays(0);
       }
     } catch (error) {
-      console.error("🔥 Error fetching dashboard data:", error.response?.data || error.message);
-      showAlert("Error!", ` ${error.response?.data?.message || error.message}`, "error");
+      console.error("🔥 Error fetching user data:", error.response?.data || error.message);
     }
   };
+  
+  
 
   return (
     <div className="bg-white border border-[#c5c6c7] h-[calc(100vh-123px)] p-6 rounded-lg">
@@ -80,9 +76,9 @@ const Dashboard = () => {
           <Grid item>
             <CardComponent icon={<FaBirthdayCake />} title="Today's Birthdays" list={birthdaysToday} />
           </Grid>
-          <Grid item>
+          {/* <Grid item>
             <CardComponent icon={<FaUsers />} title="Department Members at Work" list={departmentMembersAtWork} />
-          </Grid>
+          </Grid> */}
         </Grid>
       </Container>
     </div>

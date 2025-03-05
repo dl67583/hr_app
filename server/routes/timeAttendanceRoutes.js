@@ -35,6 +35,6 @@ router.get(
   authenticate,
   timeAttendanceController.getAttendanceStatus
 );
-router.get("/atWork", authenticate, timeAttendanceController.getDepartmentMembersAtWork);
+// router.get("/atWork", authenticate, timeAttendanceController.getDepartmentMembersAtWork);
 
 module.exports = router;

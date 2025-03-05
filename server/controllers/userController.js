@@ -1,6 +1,6 @@
-const { User, UserRole, Role, RolePermission } = require("../models");
+const { User, UserRole, Role, RolePermission, sequelize } = require("../models");
 const { getFieldPermissions } = require("../middlewares/checkPermissions");
-const { Op } = require("sequelize");
+const { Op, fn, col } = require("sequelize");
 
 const bcrypt = require("bcryptjs"); // ✅ Ensure bcrypt is imported
 exports.getAllUsers = async (req, res) => {
@@ -46,41 +46,58 @@ exports.getAllUsers = async (req, res) => {
     console.error("🔥 Error fetching users:", error);
     res.status(500).json({ message: "Error fetching users", error: error.message });
   }
-};
-
-
-exports.getUserById = async (req, res) => {
+};exports.getUserById = async (req, res) => {
   try {
+    console.log("🔍 Received request to fetch user:", req.params.id);
+    console.log("🔑 Authenticated user:", req.user);
+
     if (!req.user || !req.user.id) {
-      return res
-        .status(401)
-        .json({ message: "Unauthorized: User not authenticated" });
+      return res.status(401).json({ message: "Unauthorized: User not authenticated" });
     }
 
-    const { fields, scopes } = await getFieldPermissions(
-      req.user.id,
-      "Users",
-      "read"
-    );
+    // ✅ Get field permissions
+    const { fields, scopes } = await getFieldPermissions(req.user.id, "Users", "read");
+    console.log("🔍 User permissions:", { fields, scopes });
 
     if (!fields.length) return res.status(403).json({ message: "Forbidden" });
 
+    // ✅ Ensure essential fields are always included
+    const requiredFields = ["id", "name", "email", "daysOff", "sickDaysTaken"];
+    const finalFields = fields.includes("*") ? undefined : [...new Set([...fields, ...requiredFields])];
+
+    console.log("✅ Final Fields for Query:", finalFields);
+
     let whereClause = { id: req.params.id };
-    if (scopes.includes("department"))
+    if (scopes.includes("department")) {
       whereClause.departmentId = req.user.departmentId;
-    else if (!scopes.includes("all")) whereClause.id = req.user.id;
+      console.log("🔍 Applying department scope:", req.user.departmentId);
+    } else if (!scopes.includes("all")) {
+      whereClause.id = req.user.id;
+      console.log("🔍 Restricting to own user ID:", req.user.id);
+    }
 
-    const user = await User.findOne({ where: whereClause, attributes: fields });
+    console.log("🔍 Final Where Clause:", whereClause);
 
-    if (!user) return res.status(404).json({ message: "User not found" });
+    // ✅ Fetch user data
+    const user = await User.findOne({ 
+      where: whereClause, 
+      attributes: finalFields 
+    });
 
+    if (!user) {
+      console.warn("⚠️ User not found.");
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    console.log("✅ USERRRRR:", user.toJSON());
     res.json({ user });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching user", error: error.message });
+    console.error("🔥 Error fetching user:", error);
+    res.status(500).json({ message: "Error fetching user", error: error.message });
   }
 };
+
+
 
 exports.createUser = async (req, res) => {
   try {
@@ -261,22 +278,8 @@ exports.getUserPermissions = async (req, res) => {
 };
 
 
-exports.getBirthdaysToday = async (req, res) => {
-  try {
-    const today = new Date();
-    const formattedToday = today.toISOString().split("T")[0]; // YYYY-MM-DD format
 
-    const users = await User.findAll({
-      where: {
-        birthday: {
-          [Op.like]: `%${formattedToday.split("-").slice(1).join("-")}`, // Matches MM-DD
-        },
-      },
-      attributes: ["id", "name", "surname"],
-    });
 
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching birthdays", error });
-  }
-};
+
+
+

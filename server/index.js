@@ -25,6 +25,7 @@ const leaveRoutes = require("./routes/leaveRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const timeAttendanceRoutes = require("./routes/timeAttendanceRoutes");
 const requestRoutes = require("./routes/requestRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes")
 
 // Use API routes
 app.use("/api/auth", authRoutes);
@@ -39,6 +40,7 @@ app.use("/api/leaves", leaveRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/time-attendance", timeAttendanceRoutes);
 app.use("/api/requests", requestRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 // Serve static frontend files if applicable
 app.use(express.static(path.join(__dirname, "../client/public")));

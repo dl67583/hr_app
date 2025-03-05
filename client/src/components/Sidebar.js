@@ -38,12 +38,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
   }
 
   const menuItems = [
-    {
-      name: "Dashboard",
-      path: "/dashboard",
-      icon: <FaTachometerAlt />,
-      alwaysShow: true,
-    },
+
     {
       name: "Departments",
       path: "/departments",
@@ -70,43 +65,19 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
       resource: "Leaves",
     },
   ];
-
   const filteredMenuItems = menuItems.filter((item) => {
-    if (item.alwaysShow) return true;
-
-    if (
-      !permissions ||
-      !permissions.resources ||
-      !permissions.resources[item.resource]
-    ) {
-      console.warn(`🚨 No permissions found for resource: ${item.resource}`);
-      return false;
+    if (!permissions || !permissions.resources || !permissions.resources[item.resource]) {
+        // console.warn(`🚨 No permissions found for resource: ${item.resource}`);
+        return false;
     }
 
     const resource = permissions.resources[item.resource];
+    
+    const hasReadPermission = resource.actions.includes("read") && resource.scope !== "own";
+    const hasWritePermission = resource.actions.some(action => ["create", "update", "delete"].includes(action));
 
-    if (!resource.actions || !resource.actions.includes("read")) {
-      console.warn(`🚨 Missing 'read' permission for: ${item.resource}`);
-      return false;
-    }
-
-    if (resource.scope === "all" || resource.scope === "department") {
-      return true;
-    }
-
-    if (resource.scope === "own") {
-      return [
-        "Users",
-        "Leaves",
-        "Requests",
-        "Roles",
-        "Departments",
-        "TimeAttendance",
-      ].includes(item.resource);
-    }
-
-    return false;
-  });
+    return hasReadPermission || hasWritePermission;
+});
 
   return (
     <div
@@ -122,7 +93,18 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
           {logoText}
         </Typography>
       </div>
-
+      <button
+          key="0"
+          className={`flex items-center w-full text-left mb-4 p-3 rounded-lg transition-all font-medium ${
+            location.pathname === "/dashboard"
+              ? "bg-blue-600 text-white"
+              : "text-gray-600 hover:bg-gray-100"
+          } ${isCollapsed ? "justify-center" : ""}`}
+          onClick={() => navigate( "/dashboard")}
+        >
+          <span className="text-lg">{ <FaTachometerAlt />}</span>
+          {!isCollapsed && <span className="ml-3">Dashboard</span>}
+        </button>
       {filteredMenuItems.map((item, index) => (
         <button
           key={index}

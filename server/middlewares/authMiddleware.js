@@ -13,21 +13,31 @@ const authenticate = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     console.log("🔍 Decoded Token:", decoded);
 
-    const user = await User.findByPk(decoded.id);
+    // Fetch user and include role and department
+    const user = await User.findByPk(decoded.id, {
+      attributes: ["id", "departmentId"],
+      include: [{ model: UserRole, attributes: ["roleId"], as: "roles" }],
+    });
+
     if (!user) {
       console.error("❌ User not found:", decoded.id);
       return res.status(401).json({ message: "Invalid token: user not found" });
     }
 
-    // ✅ Fetch the user's role
-    const userRole = await UserRole.findOne({ where: { userId: user.id } });
+    // Extract role ID (ensure roles exist)
+    const userRole = user.roles.length > 0 ? user.roles[0].roleId : null;
 
     if (!userRole) {
       console.error("❌ Role not found for user:", user.id);
       return res.status(403).json({ message: "No role assigned to this user" });
     }
 
-    req.user = { id: user.id, roleId: userRole.roleId, departmentId: user.departmentId }; // ✅ Now roleId is always set
+    req.user = {
+      id: user.id,
+      roleId: userRole,
+      departmentId: user.departmentId || null, // Ensure departmentId is included
+    };
+
     console.log("✅ Authenticated User:", req.user);
     next();
   } catch (error) {

@@ -1243,10 +1243,88 @@ module.exports = {
       },
     ]);
 
-    console.log("✅ 100 New Users and 10 Departments Added Successfully.");
+ // 🔹 Fetch User IDs
+const users = await queryInterface.sequelize.query(
+  "SELECT id, email FROM Users;",
+  { type: queryInterface.sequelize.QueryTypes.SELECT }
+);
+
+// Ensure `users` exists
+if (!users || users.length === 0) {
+  throw new Error("🚨 No users found in the Users table! Check if users exist.");
+}
+
+// Create a mapping of user emails to their IDs
+const userMap = {};
+users.forEach(user => { 
+  if (user.id) {  // Ensure valid ID
+    userMap[user.email] = user.id; 
+  }
+});
+
+// Debugging: Log retrieved users
+console.log(`✅ Total Users Fetched: ${Object.keys(userMap).length}`);
+
+// 🔹 Fetch Existing Role Assignments
+const existingUserRoles = await queryInterface.sequelize.query(
+  "SELECT userId, roleId FROM UserRoles;",
+  { type: queryInterface.sequelize.QueryTypes.SELECT }
+);
+
+// Convert to a Set for quick lookup
+const existingUserRoleSet = new Set(
+  existingUserRoles.map(({ userId, roleId }) => `${userId}-${roleId}`)
+);
+
+// 🔹 Fetch Role ID for Employee
+const roles = await queryInterface.sequelize.query(
+  "SELECT id FROM Roles WHERE name='Employee' LIMIT 1;",
+  { type: queryInterface.sequelize.QueryTypes.SELECT }
+);
+
+if (!roles.length) {
+  throw new Error("🚨 Employee role not found! Ensure 'Employee' role exists.");
+}
+
+const employeeRoleId = roles[0].id;
+console.log(`✅ Employee Role ID: ${employeeRoleId}`);
+
+// 🔹 Assign Employee Role to All Users Using a For Loop
+if (employeeRoleId) {
+  const userRoles = [];
+
+  for (const email in userMap) {
+    const userId = userMap[email];
+
+    // Skip users who already have the "Employee" role
+    if (!existingUserRoleSet.has(`${userId}-${employeeRoleId}`)) {
+      userRoles.push({
+        userId: parseInt(userId), // Ensure it's an integer
+        roleId: parseInt(employeeRoleId), // Ensure it's an integer
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    } else {
+      console.log(`⚠️ Skipping userId ${userId} - already has role ${employeeRoleId}`);
+    }
+  }
+
+  // Debugging: Ensure there are valid assignments before inserting
+  console.log("✅ UserRoles to be inserted:", JSON.stringify(userRoles, null, 2));
+  console.log(`✅ Total UserRoles to insert: ${userRoles.length}`);
+
+  if (userRoles.length > 0) {
+    await queryInterface.bulkInsert("UserRoles", userRoles);
+  } else {
+    console.log("🚀 No new user-role assignments needed.");
+  }
+}
+
+
   },
 
   down: async (queryInterface) => {
+    await queryInterface.bulkDelete("UserRoles", null, {});
     await queryInterface.bulkDelete("Users", null, {});
     await queryInterface.bulkDelete("Departments", null, {});
   },
