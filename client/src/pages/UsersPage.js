@@ -22,11 +22,11 @@ import {
   CircularProgress,
   Checkbox,
   ListItemText,
+  TablePagination,
 } from "@mui/material";
 
 const API_BASE_URL = "http://localhost:5000";
 
-// ✅ Fetch users list from backend
 const fetchUsers = async (token) => {
   try {
     const { data } = await axios.get(`${API_BASE_URL}/api/users`, {
@@ -48,7 +48,6 @@ const fetchUsers = async (token) => {
   }
 };
 
-// ✅ Fetch departments list from backend
 const fetchDepartments = async (token) => {
   try {
     const { data } = await axios.get(`${API_BASE_URL}/api/departments`, {
@@ -70,7 +69,6 @@ const fetchDepartments = async (token) => {
   }
 };
 
-// ✅ Fetch roles list from backend
 const fetchRoles = async (token) => {
   try {
     const { data } = await axios.get(`${API_BASE_URL}/api/roles`, {
@@ -107,36 +105,44 @@ const UsersPage = () => {
     hourlyPay: "",
     roleId: "",
     departmentId: "",
-    daysOff: 0, // ✅ Add Days Off
-    sickDaysTaken: 0, // ✅ Add Sick Days
+    daysOff: 0,
+    sickDaysTaken: 0,
   });
 
-  // ✅ Fetch users list
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 5));
+    setPage(0);
+  };
+
   const {
     data: usersData = [],
     error,
     isLoading,
   } = useQuery(["users"], () => fetchUsers(token), { enabled: !!token });
 
-  // ✅ Fetch departments list using react-query caching
   const { data: departments = [] } = useQuery(
     ["departments"],
     () => fetchDepartments(token),
     { enabled: !!token }
   );
 
-  // ✅ Fetch roles list using react-query caching
   const { data: roles_ = [] } = useQuery(["roles"], () => fetchRoles(token), {
     enabled: !!token,
   });
 
-  // ✅ Permission-based action checks
-  const canCreateUser = permissions.resources?.Users?.actions?.includes("create");
-const canUpdateUser = permissions.resources?.Users?.actions?.includes("update");
-const canDeleteUser = permissions.resources?.Users?.actions?.includes("delete");
+  const canCreateUser =
+    permissions.resources?.Users?.actions?.includes("create");
+  const canUpdateUser =
+    permissions.resources?.Users?.actions?.includes("update");
+  const canDeleteUser =
+    permissions.resources?.Users?.actions?.includes("delete");
 
-  
-  // ✅ Mutation for creating/updating users
   const mutation = useMutation(
     async (userData) => {
       if (editUser) {
@@ -158,7 +164,6 @@ const canDeleteUser = permissions.resources?.Users?.actions?.includes("delete");
     }
   );
 
-  // ✅ Mutation for deleting users
   const deleteUser = useMutation(
     async (userId) => {
       return axios.delete(`${API_BASE_URL}/api/users/${userId}`, {
@@ -170,7 +175,6 @@ const canDeleteUser = permissions.resources?.Users?.actions?.includes("delete");
     }
   );
 
-  // ✅ Open modal for creating/editing users
   const handleOpen = (user = null) => {
     setEditUser(user);
     setNewUser(
@@ -180,13 +184,13 @@ const canDeleteUser = permissions.resources?.Users?.actions?.includes("delete");
             surname: user.surname || "",
             username: user.username || "",
             email: user.email || "",
-            password: "", // ✅ Always blank when editing
+            password: "",
             birthday: user.birthday || "",
             hourlyPay: user.hourlyPay || "",
             roleId: user.roleId?.toString() || "",
             departmentId: user.departmentId || "",
-            daysOff: user.daysOffTaken || 0, // ✅ Include Days Off
-            sickDaysTaken: user.sickDaysTaken || 0, // ✅ Include Sick Days
+            daysOff: user.daysOffTaken || 0,
+            sickDaysTaken: user.sickDaysTaken || 0,
           }
         : {
             name: "",
@@ -198,20 +202,18 @@ const canDeleteUser = permissions.resources?.Users?.actions?.includes("delete");
             hourlyPay: "",
             roleId: "",
             departmentId: "",
-            daysOff: 0, // ✅ Include Days Off
-            sickDaysTaken: 0, // ✅ Include Sick Days
+            daysOff: 0,
+            sickDaysTaken: 0,
           }
     );
 
     setOpen(true);
   };
 
-  // ✅ Handle input changes
   const handleChange = (e) => {
     setNewUser({ ...newUser, [e.target.name]: e.target.value });
   };
 
-  // ✅ Handle form submission (Create/Update)
   const handleSubmit = () => {
     const userData = { ...newUser };
 
@@ -237,19 +239,25 @@ const canDeleteUser = permissions.resources?.Users?.actions?.includes("delete");
 
   if (isLoading) return <CircularProgress />;
 
+  const displayedUsers = usersData.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+
   return (
     <div className="bg-white border border-[#c5c6c7] h-[calc(100vh-123px)] p-6 rounded-lg">
-      <h2>Users</h2>
-      {canCreateUser && (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => handleOpen()}
-        >
-          Add User
-        </Button>
-      )}
-
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-semibold">Users</h2>
+        {canCreateUser && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleOpen()}
+          >
+            Add User
+          </Button>
+        )}
+      </div>
       <Table>
         <TableHead>
           <TableRow>
@@ -259,13 +267,13 @@ const canDeleteUser = permissions.resources?.Users?.actions?.includes("delete");
             <TableCell>Username</TableCell>
             <TableCell>Email</TableCell>
             <TableCell>Department</TableCell>
-            <TableCell>Days Off</TableCell> {/* ✅ Display Days Off */}
-            <TableCell>Sick Days Taken</TableCell> {/* ✅ Display Sick Days */}
+            <TableCell>Days Off</TableCell>
+            <TableCell>Sick Days Taken</TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {usersData.map((user) => (
+          {displayedUsers.map((user) => (
             <TableRow key={user.id}>
               <TableCell>{user.id}</TableCell>
               <TableCell>{user.name}</TableCell>
@@ -277,9 +285,7 @@ const canDeleteUser = permissions.resources?.Users?.actions?.includes("delete");
                   "No Department"}
               </TableCell>
               <TableCell>{user.daysOffTaken}</TableCell>{" "}
-              {/* ✅ Display Days Off */}
               <TableCell>{user.sickDaysTaken}</TableCell>{" "}
-              {/* ✅ Display Sick Days */}
               <TableCell>
                 {canUpdateUser && (
                   <Button onClick={() => handleOpen(user)}>Edit</Button>
@@ -294,6 +300,16 @@ const canDeleteUser = permissions.resources?.Users?.actions?.includes("delete");
           ))}
         </TableBody>
       </Table>
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        count={usersData.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+        className="mt-4"
+      />
       <Dialog
         open={open}
         onClose={() => setOpen(false)}
@@ -301,105 +317,107 @@ const canDeleteUser = permissions.resources?.Users?.actions?.includes("delete");
         maxWidth="sm"
       >
         <DialogTitle>{editUser ? "Edit User" : "Add User"}</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="First Name"
-            name="name"
-            fullWidth
-            value={newUser.name}
-            onChange={handleChange}
-            style={{ marginBottom: 10 }}
-          />
-          <TextField
-            label="Surname"
-            name="surname"
-            fullWidth
-            value={newUser.surname}
-            onChange={handleChange}
-            style={{ marginBottom: 10 }}
-          />
-          <TextField
-            label="Username"
-            name="username"
-            fullWidth
-            value={newUser.username}
-            onChange={handleChange}
-            style={{ marginBottom: 10 }}
-          />
-          <TextField
-            label="Email"
-            name="email"
-            fullWidth
-            value={newUser.email}
-            onChange={handleChange}
-            style={{ marginBottom: 10 }}
-          />
-          <TextField
-            label="Password"
-            name="password"
-            type="password"
-            fullWidth
-            value={newUser.password}
-            onChange={handleChange}
-            style={{ marginBottom: 10 }}
-          />
-          <TextField
-            label="Birthday"
-            name="birthday"
-            type="date"
-            fullWidth
-            value={newUser.birthday}
-            onChange={handleChange}
-            InputLabelProps={{ shrink: true }}
-            style={{ marginBottom: 10 }}
-          />
-          <TextField
-            label="Hourly Pay"
-            name="hourlyPay"
-            type="number"
-            fullWidth
-            value={newUser.hourlyPay}
-            onChange={handleChange}
-            style={{ marginBottom: 10 }}
-          />
-          <FormControl fullWidth style={{ marginBottom: 10 }}>
-            <InputLabel>Department</InputLabel>
-            <Select
-              name="departmentId"
-              value={newUser.departmentId}
+        <div className="">
+          <DialogContent>
+            <TextField
+              label="First Name"
+              name="name"
+              fullWidth
+              value={newUser.name}
               onChange={handleChange}
-            >
-              {departments.map((dept) => (
-                <MenuItem key={dept.id} value={dept.id}>
-                  {dept.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl fullWidth>
-            <InputLabel>Role</InputLabel>
-            <Select
-              name="roleId"
-              value={newUser.roleId}
+              style={{ marginBottom: 10 }}
+            />
+            <TextField
+              label="Surname"
+              name="surname"
+              fullWidth
+              value={newUser.surname}
               onChange={handleChange}
-            >
-              {roles_.map((role) => (
-                <MenuItem key={role.id} value={role.id}>
-                  {role.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <TextField
-            label="Days Off"
-            name="daysOff"
-            type="number"
-            fullWidth
-            value={newUser.daysOffTaken}
-            onChange={handleChange}
-            style={{ marginBottom: 10 }}
-          />
-        </DialogContent>
+              style={{ marginBottom: 10 }}
+            />
+            <TextField
+              label="Username"
+              name="username"
+              fullWidth
+              value={newUser.username}
+              onChange={handleChange}
+              style={{ marginBottom: 10 }}
+            />
+            <TextField
+              label="Email"
+              name="email"
+              fullWidth
+              value={newUser.email}
+              onChange={handleChange}
+              style={{ marginBottom: 10 }}
+            />
+            <TextField
+              label="Password"
+              name="password"
+              type="password"
+              fullWidth
+              value={newUser.password}
+              onChange={handleChange}
+              style={{ marginBottom: 10 }}
+            />
+            <TextField
+              label="Birthday"
+              name="birthday"
+              type="date"
+              fullWidth
+              value={newUser.birthday}
+              onChange={handleChange}
+              InputLabelProps={{ shrink: true }}
+              style={{ marginBottom: 10 }}
+            />
+            <TextField
+              label="Hourly Pay"
+              name="hourlyPay"
+              type="number"
+              fullWidth
+              value={newUser.hourlyPay}
+              onChange={handleChange}
+              style={{ marginBottom: 10 }}
+            />
+            <FormControl fullWidth style={{ marginBottom: 10 }}>
+              <InputLabel>Department</InputLabel>
+              <Select
+                name="departmentId"
+                value={newUser.departmentId}
+                onChange={handleChange}
+              >
+                {departments.map((dept) => (
+                  <MenuItem key={dept.id} value={dept.id}>
+                    {dept.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth>
+              <InputLabel>Role</InputLabel>
+              <Select
+                name="roleId"
+                value={newUser.roleId}
+                onChange={handleChange}
+              >
+                {roles_.map((role) => (
+                  <MenuItem key={role.id} value={role.id}>
+                    {role.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <TextField
+              label="Days Off"
+              name="daysOff"
+              type="number"
+              fullWidth
+              value={newUser.daysOffTaken}
+              onChange={handleChange}
+              style={{ marginBottom: 10, marginTop: 10 }}
+            />
+          </DialogContent>
+        </div>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Cancel</Button>
           <Button color="primary" onClick={handleSubmit}>

@@ -180,17 +180,19 @@ const LeavesPage = () => {
 
   return (
     <div className="bg-white border border-[#c5c6c7] h-[calc(100vh-123px)] p-6 rounded-lg">
-      <h2>Leave Requests</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-semibold">Leave Requests</h2>
 
-      {canCreateLeave && (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => handleOpen()}
-        >
-          Add Leave Request
-        </Button>
-      )}
+        {canCreateLeave && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleOpen()}
+          >
+            Add Leave Request
+          </Button>
+        )}
+      </div>
 
       <Table>
         <TableHead>

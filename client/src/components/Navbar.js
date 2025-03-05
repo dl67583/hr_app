@@ -14,12 +14,11 @@ const Navbar = () => {
   const [loading, setLoading] = useState(true);
   const [elapsedTime, setElapsedTime] = useState("");
 
-  // ✅ Wait for user data before fetching check-in status
   useEffect(() => {
     if (token && user?.id) {
       checkCurrentStatus();
     }
-  }, [user]); // Only run when `user` is set
+  }, [user]);
 
   useEffect(() => {
     let intervalId;
@@ -99,7 +98,9 @@ const Navbar = () => {
   return (
     <div className="fixed top-4 right-5 bg-white border border-[#c5c6c7] p-4 rounded-lg flex justify-between items-center w-[90%] max-w-[1200px]">
       <div className="flex items-center gap-4">
-        {user && <span className="text-black font-bold">{`Welcome, ${user.email}`}</span>}
+        {user && (
+          <span className="text-black font-bold">{`Welcome, ${user.email}`}</span>
+        )}
       </div>
 
       <div className="flex items-center gap-4">
@@ -108,10 +109,18 @@ const Navbar = () => {
             <button
               onClick={handleCheckInOut}
               className={`px-6 py-2 w-[120px] h-[40px] rounded-lg text-white font-semibold transition duration-300 ${
-                isCheckedIn === null ? "opacity-0" : isCheckedIn ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"
+                isCheckedIn === null
+                  ? "opacity-0"
+                  : isCheckedIn
+                  ? "bg-red-600 hover:bg-red-700"
+                  : "bg-green-600 hover:bg-green-700"
               }`}
             >
-              {isCheckedIn === null ? "⏳" : isCheckedIn ? elapsedTime : "Check In"}
+              {isCheckedIn === null
+                ? "⏳"
+                : isCheckedIn
+                ? elapsedTime
+                : "Check In"}
             </button>
 
             <button

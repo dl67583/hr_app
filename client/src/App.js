@@ -5,11 +5,11 @@ import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import UsersPage from "./pages/UsersPage";
 import RolesPage from "./pages/RolesPage";
-import DepartmentsPage from "./pages/DepartentsPage";
+import DepartmentsPage from "./pages/DepartmentsPage";
 import RequestsPage from "./pages/Requests";
 import Layout from "./components/Layout";
 import Navbar from "./components/Navbar";
-import LeavesPage from "./pages/LeavesPage"
+import LeavesPage from "./pages/LeavesPage";
 
 function App() {
   return (

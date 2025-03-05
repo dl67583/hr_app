@@ -51,10 +51,13 @@ const DepartmentsPage = () => {
     enabled: !!token,
   });
   const canReadDepartments = permissions?.actions?.includes("read") || false;
-  const canCreateDepartment = permissions.resources?.Departments?.actions?.includes("create");
-  const canUpdateDepartment = permissions.resources?.Departments?.actions?.includes("update");
-  const canDeleteDepartment = permissions.resources?.Departments?.actions?.includes("delete");
-  
+  const canCreateDepartment =
+    permissions.resources?.Departments?.actions?.includes("create");
+  const canUpdateDepartment =
+    permissions.resources?.Departments?.actions?.includes("update");
+  const canDeleteDepartment =
+    permissions.resources?.Departments?.actions?.includes("delete");
+
   // console.log("🔍 Permissions for Departments:", permissions);
 
   // Mutation for creating/updating a department
@@ -116,41 +119,44 @@ const DepartmentsPage = () => {
   return (
     <div>
       <div className="bg-white border border-[#c5c6c7] h-[calc(100vh-123px)] p-6 rounded-lg">
-        <h2>Departments</h2>
-        {canCreateDepartment && (
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => handleOpen()}
-          >
-            Add Department
-          </Button>
-        )}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-semibold">Departments</h2>
+          {canCreateDepartment && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleOpen()}
+            >
+              Add Department
+            </Button>
+          )}
+        </div>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell>ID</TableCell>
               <TableCell>Name</TableCell>
-              
-                {(canUpdateDepartment|| canDeleteDepartment )&&
+
+              {(canUpdateDepartment || canDeleteDepartment) && (
                 <TableCell>Actions</TableCell>
-                
-                
-                }
-              
-              
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
             {departmentsData.map((dept) => (
               <TableRow key={dept.id}>
                 <TableCell>{dept.id}</TableCell>
+                <TableCell>{dept.name}</TableCell>
                 <TableCell>
-                {canUpdateDepartment && <Button onClick={() => setEditDepartment(dept)}>Edit</Button>}
-                {canDeleteDepartment && <Button onClick={() => deleteDepartment.mutate(dept.id)}>Delete</Button>}
-              </TableCell>
-                  
-                
+                  {canUpdateDepartment && (
+                    <Button onClick={() => handleOpen(dept)}>Edit</Button>
+                  )}
+                  {canDeleteDepartment && (
+                    <Button onClick={() => deleteDepartment.mutate(dept.id)}>
+                      Delete
+                    </Button>
+                  )}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -160,15 +166,17 @@ const DepartmentsPage = () => {
           <DialogTitle>
             {editDepartment ? "Edit Department" : "Add Department"}
           </DialogTitle>
-          <DialogContent>
-            <TextField
-              label="Department Name"
-              name="name"
-              fullWidth
-              value={newDepartment.name}
-              onChange={handleChange}
-            />
-          </DialogContent>
+          <div>
+            <DialogContent>
+              <TextField
+                label="Department Name"
+                name="name"
+                fullWidth
+                value={newDepartment.name}
+                onChange={handleChange}
+              />
+            </DialogContent>
+          </div>
           <DialogActions>
             <Button onClick={() => setOpen(false)}>Cancel</Button>
             <Button color="primary" onClick={handleSubmit}>
