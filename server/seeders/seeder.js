@@ -64,49 +64,49 @@ module.exports = {
     ]);
 
     // 🔹 Define Role Permissions
-    const allTables = ["Users", "Departments", "Roles", "UserRoles", "RolePermissions", "Requests", "Leaves", "Payments", "TimeAttendance"];
     const rolePermissions = [];
 
-    // 🔹 Superadmin: Full access to everything
-    allTables.forEach(table => {
-      ["read", "create", "update", "delete"].forEach(action => {
+    // 🔹 Superadmin: Full access
+    ["Users", "Departments", "Roles", "UserRoles", "RolePermissions", "Requests", "Leaves", "Payments", "TimeAttendance"].forEach(table => {
+      ["create", "read", "update", "delete"].forEach(action => {
         rolePermissions.push({
           roleId: roleMap["Superadmin"],
           resource: table,
           action: action,
-          fields: "*", 
-          scope: "all", 
+          fields: "*",
+          scope: "all",
           createdAt: new Date(),
           updatedAt: new Date(),
         });
       });
     });
 
-    // 🔹 Manager: Can manage users in their department, approve requests, and view time attendance
+    // 🔹 Manager: Manage users and requests in their department
     rolePermissions.push(
       { roleId: roleMap["Manager"], resource: "Users", action: "read", fields: "id,name,email,departmentId", scope: "department", createdAt: new Date(), updatedAt: new Date() },
-      { roleId: roleMap["Manager"], resource: "Users", action: "update", fields: "email", scope: "department", createdAt: new Date(), updatedAt: new Date() },
-      { roleId: roleMap["Manager"], resource: "Requests", action: "approve", fields: "*", scope: "department", createdAt: new Date(), updatedAt: new Date() },
+      { roleId: roleMap["Manager"], resource: "Requests", action: "read", fields: "*", scope: "department", createdAt: new Date(), updatedAt: new Date() },
       { roleId: roleMap["Manager"], resource: "TimeAttendance", action: "read", fields: "*", scope: "department", createdAt: new Date(), updatedAt: new Date() }
     );
 
-    // 🔹 IT Manager: Can create and manage IT users
+    // 🔹 IT Manager: Can create and update IT users
     rolePermissions.push(
-      { roleId: roleMap["IT Manager"], resource: "Users", action: "create", fields: "id,name,email", scope: "department", createdAt: new Date(), updatedAt: new Date() },
+      { roleId: roleMap["IT Manager"], resource: "Users", action: "create", fields: "name,email", scope: "department", createdAt: new Date(), updatedAt: new Date() },
       { roleId: roleMap["IT Manager"], resource: "Users", action: "update", fields: "email", scope: "department", createdAt: new Date(), updatedAt: new Date() }
     );
 
-    // 🔹 HR: Can manage leaves, requests, and view employees
+    // 🔹 HR: Manage leaves and employee records
     rolePermissions.push(
       { roleId: roleMap["HR"], resource: "Users", action: "read", fields: "id,name,email,departmentId", scope: "department", createdAt: new Date(), updatedAt: new Date() },
-      { roleId: roleMap["HR"], resource: "Leaves", action: "manage", fields: "*", scope: "department", createdAt: new Date(), updatedAt: new Date() }
+      { roleId: roleMap["HR"], resource: "Leaves", action: "create", fields: "type,description,status", scope: "department", createdAt: new Date(), updatedAt: new Date() },
+      { roleId: roleMap["HR"], resource: "Leaves", action: "read", fields: "*", scope: "department", createdAt: new Date(), updatedAt: new Date() }
     );
 
-    // 🔹 Employee: Can only read their own profile and submit requests
+    // 🔹 Employee: Limited permissions
     rolePermissions.push(
-      { roleId: roleMap["Employee"], resource: "Users", action: "read", fields: "*", scope: "own", createdAt: new Date(), updatedAt: new Date() },
-      { roleId: roleMap["Employee"], resource: "Departments", action: "read", fields: "*", scope: "own", createdAt: new Date(), updatedAt: new Date() },
-      { roleId: roleMap["Employee"], resource: "Requests", action: "create", fields: "*", scope: "own", createdAt: new Date(), updatedAt: new Date() }
+      { roleId: roleMap["Employee"], resource: "Users", action: "read", fields: "id,name,email", scope: "own", createdAt: new Date(), updatedAt: new Date() },
+      { roleId: roleMap["Employee"], resource: "Requests", action: "create", fields: "*", scope: "own", createdAt: new Date(), updatedAt: new Date() },
+      { roleId: roleMap["Employee"], resource: "Leaves", action: "create", fields: "type,description", scope: "own", createdAt: new Date(), updatedAt: new Date() },
+      { roleId: roleMap["Employee"], resource: "Leaves", action: "read", fields: "*", scope: "own", createdAt: new Date(), updatedAt: new Date() }
     );
 
     await queryInterface.bulkInsert("RolePermissions", rolePermissions);

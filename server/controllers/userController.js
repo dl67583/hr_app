@@ -190,6 +190,7 @@ exports.deleteUser = async (req, res) => {
       .json({ message: "Error deleting user", error: error.message });
   }
 };
+
 exports.getUserPermissions = async (req, res) => {
   try {
     console.log("🔍 Fetching permissions for user ID:", req.user?.id);
@@ -199,22 +200,65 @@ exports.getUserPermissions = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized: No valid token" });
     }
 
-    // ✅ Fetch user's permissions
-    const permissions = await getFieldPermissions(req.user.id, "Users");
+    // ✅ Fetch user with role information
+    const user = await User.findOne({
+      where: { id: req.user.id },
+      include: [
+        {
+          model: Role,
+          as: "Roles",
+          attributes: ["id", "name"],
+          through: { attributes: [] }, // Exclude join table fields
+        },
+      ],
+    });
 
-    if (!permissions.actions.length) {
-      console.warn("⚠️ User has no assigned permissions");
-      return res.status(403).json({ message: "No permissions found for user" });
+    if (!user || !user.Roles.length) {
+      console.warn("🚨 User has no assigned roles!");
+      return res.status(403).json({ message: "User has no assigned roles" });
     }
 
-    console.log("✅ Permissions Fetched:", permissions);
-    res.json(permissions);
+    // ✅ Fetch role IDs
+    const roleIds = user.Roles.map((role) => role.id);
+
+    // ✅ Fetch all permissions for the user's roles
+    const rolePermissions = await RolePermission.findAll({
+      where: { roleId: roleIds },
+      attributes: ["resource", "action", "fields", "scope"],
+    });
+
+    if (!rolePermissions.length) {
+      console.warn("🚨 No permissions found for this user!");
+      return res.status(403).json({ message: "No permissions assigned" });
+    }
+
+    // 🔹 Structure permissions
+    const resourcePermissions = {};
+
+    rolePermissions.forEach(({ resource, action, fields, scope }) => {
+      if (!resourcePermissions[resource]) {
+        resourcePermissions[resource] = { actions: [], fields: [], scope };
+      }
+      if (!resourcePermissions[resource].actions.includes(action)) {
+        resourcePermissions[resource].actions.push(action);
+      }
+      if (!resourcePermissions[resource].fields.includes(fields)) {
+        resourcePermissions[resource].fields.push(fields);
+      }
+    });
+
+    // ✅ Final API Response
+    const updatedPermissions = {
+      resources: resourcePermissions, // 👈 Now actions are inside resources
+    };
+
+    console.log("✅ Returning Permissions:", updatedPermissions);
+    res.json(updatedPermissions);
   } catch (error) {
     console.error("🔥 Error fetching permissions:", error);
     res.status(500).json({ message: "Error fetching user permissions", error: error.message });
   }
 };
-
 
 
 exports.getBirthdaysToday = async (req, res) => {

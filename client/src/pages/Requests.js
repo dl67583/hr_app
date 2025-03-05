@@ -37,8 +37,12 @@ const fetchRequests = async (token) => {
 };
 
 const RequestsPage = () => {
-    const { token, user } = useContext(AuthContext);
+    const { token, user, permissions } = useContext(AuthContext);
     const queryClient = useQueryClient();
+    const canCreateRequest = permissions.resources?.Requests?.actions?.includes("create");
+const canUpdateRequest = permissions.resources?.Requests?.actions?.includes("update");
+const canDeleteRequest = permissions.resources?.Requests?.actions?.includes("delete");
+
     const [open, setOpen] = useState(false);
     const [editRequest, setEditRequest] = useState(null);
     const [newRequest, setNewRequest] = useState({
@@ -125,10 +129,12 @@ const RequestsPage = () => {
         <h2>Requests</h2>
   
         {/* Button to open the modal for adding a new request */}
-        <Button variant="contained" color="primary" onClick={() => handleOpen()}>
-          Add Request
-        </Button>
-  
+        {canCreateRequest && (
+  <Button variant="contained" color="primary" onClick={() => handleOpen()}>
+    Add Request
+  </Button>
+)}
+
         <Table>
           <TableHead>
             <TableRow>
@@ -147,13 +153,9 @@ const RequestsPage = () => {
                 <TableCell>{request.description}</TableCell>
                 <TableCell>{request.status}</TableCell>
                 <TableCell>
-                  <Button onClick={() => handleOpen(request)} color="primary">
-                    Edit
-                  </Button>
-                  <Button onClick={() => deleteRequest.mutate(request.id)} color="secondary">
-                    Delete
-                  </Button>
-                </TableCell>
+        {canUpdateRequest && <Button onClick={() => handleOpen(request)} color="primary">Edit</Button>}
+        {canDeleteRequest && <Button onClick={() => deleteRequest.mutate(request.id)} color="secondary">Delete</Button>}
+      </TableCell>
               </TableRow>
             ))}
           </TableBody>

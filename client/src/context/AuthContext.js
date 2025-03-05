@@ -50,12 +50,12 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
-      console.log("🔄 Refreshing access token...");
+      // console.log("🔄 Refreshing access token...");
       const { data } = await axios.post("http://localhost:5000/api/auth/refresh-token", {
         refreshToken,
       });
 
-      console.log("✅ New access token received:", data.accessToken);
+      // console.log("✅ New access token received:", data.accessToken);
 
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken); // ✅ Update refresh token
@@ -71,10 +71,10 @@ export const AuthProvider = ({ children }) => {
   // ✅ Function to handle login
   const login = async (email, password) => {
     try {
-      console.log("🔍 Sending login request...");
+      // console.log("🔍 Sending login request...");
       const { data } = await axios.post("http://localhost:5000/api/auth/login", { email, password });
 
-      console.log("✅ Login successful. Token received:", data.accessToken);
+      // console.log("✅ Login successful. Token received:", data.accessToken);
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken); // ✅ Save refresh token
 
@@ -94,27 +94,40 @@ export const AuthProvider = ({ children }) => {
   // ✅ Fetch User Roles and Permissions
   const fetchUserRolesAndPermissions = async (userId, accessToken) => {
     try {
-      console.log("📡 Fetching roles & permissions for user ID:", userId);
-
+      // console.log("📡 Fetching roles & permissions for user ID:", userId);
+  
       if (!userId || !accessToken) {
         console.warn("⚠️ Skipping API call: Missing user ID or token");
         return;
       }
-
+  
       const response = await axios.get(`http://localhost:5000/api/users/permissions`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-
-      console.log("📌 API Response (Roles & Permissions):", JSON.stringify(response.data, null, 2));
-
+  
+      console.log("📌 API Response (Roles & Permissions):", response.data);
+  
+      // ✅ Store fields, scopes, and actions correctly
       setRoles(response.data.roles || []);
-      setPermissions(response.data.actions || []);
+      setPermissions({
+        resources: response.data.resources || {},
+        scopes: new Set(response.data.scopes || []), // Convert to Set for easy lookups
+      });
+      
+      
+  
+      // console.log("✅ Stored Permissions in AuthContext:", {
+      //   fields: response.data.fields,
+      //   scopes: response.data.scopes,
+      //   actions: response.data.actions,
+      // });
     } catch (error) {
       console.error("❌ Error fetching user roles and permissions:", error.response?.data || error.message);
       showAlert("Error!", `${error.response?.data?.message || error.message}`, "error");
-      setPermissions([]);
+      setPermissions({ fields: [], scopes: [], actions: [] }); // Ensure it resets on failure
     }
   };
+  
 
   // ✅ Automatically Refresh Token 5 Minutes Before Expiry
   useEffect(() => {
@@ -138,7 +151,7 @@ export const AuthProvider = ({ children }) => {
           // ✅ Refresh token 5 minutes before expiry
           const refreshTime = Math.max(timeLeft - 5 * 60 * 1000, 0);
           const timeout = setTimeout(async () => {
-            console.log("🔄 Attempting token refresh before expiry...");
+            // console.log("🔄 Attempting token refresh before expiry...");
             await refreshAccessToken();
           }, refreshTime);
 

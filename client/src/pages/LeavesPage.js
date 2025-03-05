@@ -30,8 +30,15 @@ const fetchLeaves = async (token) => {
     });
     return data.leaves || [];
   } catch (error) {
-    console.error("Error fetching leaves:", error.response?.data || error.message);
-    showAlert("Error!",` ${error.response?.data?.message || error.message}`, "error");
+    console.error(
+      "Error fetching leaves:",
+      error.response?.data || error.message
+    );
+    showAlert(
+      "Error!",
+      ` ${error.response?.data?.message || error.message}`,
+      "error"
+    );
     return [];
   }
 };
@@ -45,7 +52,8 @@ const fetchUsers = async (token) => {
 };
 
 const LeavesPage = () => {
-  const { token, user } = useContext(AuthContext);
+  const { token, user, permissions } = useContext(AuthContext);
+
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editLeave, setEditLeave] = useState(null);
@@ -56,6 +64,12 @@ const LeavesPage = () => {
     status: "pending",
   });
   const [users, setUsers] = useState([]);
+  const canCreateLeave =
+    permissions.resources?.Leaves?.actions?.includes("create");
+  const canUpdateLeave =
+    permissions.resources?.Leaves?.actions?.includes("update");
+  const canDeleteLeave =
+    permissions.resources?.Leaves?.actions?.includes("delete");
 
   // Fetch users
   useEffect(() => {
@@ -65,19 +79,23 @@ const LeavesPage = () => {
   }, [token]);
 
   // Fetch Leaves
-  const { data: leavesData = [], isLoading, error } = useQuery(
-    ["leaves"],
-    () => fetchLeaves(token),
-    { enabled: !!token }
-  );
+  const {
+    data: leavesData = [],
+    isLoading,
+    error,
+  } = useQuery(["leaves"], () => fetchLeaves(token), { enabled: !!token });
 
   const mutation = useMutation(
     async (leaveRequest) => {
       if (editLeave) {
         // Update existing leave request
-        return axios.put(`${API_BASE_URL}/api/leaves/${editLeave.id}`, leaveRequest, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        return axios.put(
+          `${API_BASE_URL}/api/leaves/${editLeave.id}`,
+          leaveRequest,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
       } else {
         // Create new leave request
         return axios.post(`${API_BASE_URL}/api/leaves`, leaveRequest, {
@@ -90,11 +108,23 @@ const LeavesPage = () => {
         queryClient.invalidateQueries("leaves");
         setOpen(false);
         setEditLeave(null);
-        setLeaveData({ type: "paid", description: "", userId: "", status: "pending" });
+        setLeaveData({
+          type: "paid",
+          description: "",
+          userId: "",
+          status: "pending",
+        });
       },
       onError: (error) => {
-        console.error("❌ Error creating or updating leave:", error.response?.data || error.message);
-        showAlert("Error!",` ${error.response?.data?.message || error.message}`, "error");
+        console.error(
+          "❌ Error creating or updating leave:",
+          error.response?.data || error.message
+        );
+        showAlert(
+          "Error!",
+          ` ${error.response?.data?.message || error.message}`,
+          "error"
+        );
       },
     }
   );
@@ -115,7 +145,12 @@ const LeavesPage = () => {
     setEditLeave(leave);
     setLeaveData(
       leave
-        ? { type: leave.type, description: leave.description, userId: leave.userId, status: leave.status }
+        ? {
+            type: leave.type,
+            description: leave.description,
+            userId: leave.userId,
+            status: leave.status,
+          }
         : { type: "paid", description: "", userId: "", status: "pending" }
     );
     setOpen(true);
@@ -147,10 +182,15 @@ const LeavesPage = () => {
     <div className="bg-white border border-[#c5c6c7] h-[calc(100vh-123px)] p-6 rounded-lg">
       <h2>Leave Requests</h2>
 
-      {/* Button to open the modal for adding a new leave request */}
-      <Button variant="contained" color="primary" onClick={() => handleOpen()}>
-        Add Leave Request
-      </Button>
+      {canCreateLeave && (
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => handleOpen()}
+        >
+          Add Leave Request
+        </Button>
+      )}
 
       <Table>
         <TableHead>
@@ -169,15 +209,25 @@ const LeavesPage = () => {
               <TableCell>{leave.id}</TableCell>
               <TableCell>{leave.type}</TableCell>
               <TableCell>{leave.description}</TableCell>
-              <TableCell>{users.find((user) => user.id === leave.userId)?.name || "Unknown"}</TableCell>
+              <TableCell>
+                {users.find((user) => user.id === leave.userId)?.name ||
+                  "Unknown"}
+              </TableCell>
               <TableCell>{leave.status}</TableCell>
               <TableCell>
-                <Button onClick={() => handleOpen(leave)} color="primary">
-                  Edit
-                </Button>
-                <Button onClick={() => deleteLeave.mutate(leave.id)} color="secondary">
-                  Delete
-                </Button>
+                {canUpdateLeave && (
+                  <Button onClick={() => handleOpen(leave)} color="primary">
+                    Edit
+                  </Button>
+                )}
+                {canDeleteLeave && (
+                  <Button
+                    onClick={() => deleteLeave.mutate(leave.id)}
+                    color="secondary"
+                  >
+                    Delete
+                  </Button>
+                )}
               </TableCell>
             </TableRow>
           ))}
@@ -186,7 +236,9 @@ const LeavesPage = () => {
 
       {/* Modal for creating/editing a leave request */}
       <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>{editLeave ? "Edit Leave Request" : "Add Leave Request"}</DialogTitle>
+        <DialogTitle>
+          {editLeave ? "Edit Leave Request" : "Add Leave Request"}
+        </DialogTitle>
         <DialogContent>
           <Select
             name="type"

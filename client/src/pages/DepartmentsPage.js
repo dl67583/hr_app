@@ -36,7 +36,7 @@ const fetchDepartments = async (token) => {
 };
 
 const DepartmentsPage = () => {
-  const { token, permissions: userPermissions = [] } = useContext(AuthContext);
+  const { token, permissions } = useContext(AuthContext);
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editDepartment, setEditDepartment] = useState(null);
@@ -50,6 +50,12 @@ const DepartmentsPage = () => {
   } = useQuery(["departments"], () => fetchDepartments(token), {
     enabled: !!token,
   });
+  const canReadDepartments = permissions?.actions?.includes("read") || false;
+  const canCreateDepartment = permissions.resources?.Departments?.actions?.includes("create");
+  const canUpdateDepartment = permissions.resources?.Departments?.actions?.includes("update");
+  const canDeleteDepartment = permissions.resources?.Departments?.actions?.includes("delete");
+  
+  // console.log("🔍 Permissions for Departments:", permissions);
 
   // Mutation for creating/updating a department
   const mutation = useMutation(
@@ -111,7 +117,7 @@ const DepartmentsPage = () => {
     <div>
       <div className="bg-white border border-[#c5c6c7] h-[calc(100vh-123px)] p-6 rounded-lg">
         <h2>Departments</h2>
-        {userPermissions.includes("Departments:create") && (
+        {canCreateDepartment && (
           <Button
             variant="contained"
             color="primary"
@@ -125,35 +131,26 @@ const DepartmentsPage = () => {
             <TableRow>
               <TableCell>ID</TableCell>
               <TableCell>Name</TableCell>
-              {(userPermissions.includes("Departments:update") ||
-                userPermissions.includes("Departments:delete")) && (
+              
+                {(canUpdateDepartment|| canDeleteDepartment )&&
                 <TableCell>Actions</TableCell>
-              )}
+                
+                
+                }
+              
+              
             </TableRow>
           </TableHead>
           <TableBody>
             {departmentsData.map((dept) => (
               <TableRow key={dept.id}>
                 <TableCell>{dept.id}</TableCell>
-                <TableCell>{dept.name}</TableCell>
-                {(userPermissions.includes("Departments:update") ||
-                  userPermissions.includes("Departments:delete")) && (
-                  <TableCell>
-                    {userPermissions.includes("Departments:update") && (
-                      <Button onClick={() => handleOpen(dept)} color="primary">
-                        Edit
-                      </Button>
-                    )}
-                    {userPermissions.includes("Departments:delete") && (
-                      <Button
-                        onClick={() => deleteDepartment.mutate(dept.id)}
-                        color="secondary"
-                      >
-                        Delete
-                      </Button>
-                    )}
-                  </TableCell>
-                )}
+                <TableCell>
+                {canUpdateDepartment && <Button onClick={() => setEditDepartment(dept)}>Edit</Button>}
+                {canDeleteDepartment && <Button onClick={() => deleteDepartment.mutate(dept.id)}>Delete</Button>}
+              </TableCell>
+                  
+                
               </TableRow>
             ))}
           </TableBody>

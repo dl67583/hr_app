@@ -9,12 +9,23 @@ module.exports = (sequelize) => {
       autoIncrement: true,
     },
     type: {
-      type: DataTypes.ENUM("paid", "unpaid", "maternity", "paternity", "medical"),
+      type: DataTypes.ENUM(
+        "paid",
+        "unpaid",
+        "maternity",
+        "paternity",
+        "medical"
+      ),
       allowNull: false,
     },
     description: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    status: {
+      type: DataTypes.ENUM("pending", "approved", "rejected"),
+      allowNull: false,
+      defaultValue: "pending",
     },
     userId: {
       type: DataTypes.INTEGER,
@@ -36,7 +47,10 @@ module.exports = (sequelize) => {
 
   Leave.associate = (models) => {
     Leave.belongsTo(models.User, { foreignKey: "userId", as: "user" });
-    Leave.belongsTo(models.Department, { foreignKey: "departmentId", as: "department" });
+    Leave.belongsTo(models.Department, {
+      foreignKey: "departmentId",
+      as: "department",
+    });
   };
 
   return Leave;

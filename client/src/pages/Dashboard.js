@@ -9,11 +9,11 @@ import {
   FaUsers,
 } from "react-icons/fa";
 import showAlert from "../components/showAlert";
-import CardComponent from "../components/CardComponent"; // Adjust path if necessary
+import CardComponent from "../components/CardComponent";
 import { Grid, Container } from "@mui/material";
 
 const Dashboard = () => {
-  const { user, token } = useContext(AuthContext);
+  const { user, token, permissions } = useContext(AuthContext);
   const [daysOff, setDaysOff] = useState(0);
   const [daysOffSpent, setDaysOffSpent] = useState(0);
   const [sickDays, setSickDays] = useState(0);
@@ -21,15 +21,13 @@ const Dashboard = () => {
   const [departmentMembersAtWork, setDepartmentMembersAtWork] = useState([]);
 
   useEffect(() => {
-    if (user && user.id) {
+    if (user && user.id && permissions) {
       console.log("✅ Fetching dashboard data for user ID:", user.id);
       fetchDashboardData(user.id);
     } else {
-      console.warn(
-        "⚠️ User ID is undefined, waiting for AuthContext to update..."
-      );
+      console.warn("⚠️ User ID or permissions are undefined, waiting for update...");
     }
-  }, [user]);
+  }, [user, permissions]);
 
   const fetchDashboardData = async (userId) => {
     try {
@@ -39,40 +37,30 @@ const Dashboard = () => {
       }
 
       const headers = { Authorization: `Bearer ${token}` };
-
       const userRes = await axios.get(`/api/users/${userId}`, { headers });
       setDaysOff(userRes.data.user.daysOff || 0);
       setSickDays(userRes.data.user.sickDaysTaken || 0);
 
-      const leaveRes = await axios.get(`/api/leaves?userId=${userId}`, {
-        headers,
-      });
-      setDaysOffSpent(leaveRes.data.length || 0);
+      if (permissions.resources?.Leaves?.actions?.includes("read")) {
+        const leaveRes = await axios.get(`/api/leaves?userId=${userId}`, { headers });
+        setDaysOffSpent(leaveRes.data.length || 0);
+      }
 
-      const birthdayRes = await axios.get(`/api/users/birthdays/today`, {
-        headers,
-      });
-      setBirthdaysToday(
-        Array.isArray(birthdayRes.data) ? birthdayRes.data : []
-      );
+      if (permissions.resources?.Users?.scope === "all") {
+        const birthdayRes = await axios.get(`/api/users/birthdays/today`, { headers });
+        setBirthdaysToday(Array.isArray(birthdayRes.data) ? birthdayRes.data : []);
+      }
 
-      const attendanceRes = await axios.get(
-        `/api/timeAttendance/atWork?departmentId=${userRes.data.user.departmentId}`,
-        { headers }
-      );
-      setDepartmentMembersAtWork(
-        Array.isArray(attendanceRes.data) ? attendanceRes.data : []
-      );
+      if (permissions.resources?.TimeAttendance?.scope === "department") {
+        const attendanceRes = await axios.get(
+          `/api/timeAttendance/atWork?departmentId=${userRes.data.user.departmentId}`,
+          { headers }
+        );
+        setDepartmentMembersAtWork(Array.isArray(attendanceRes.data) ? attendanceRes.data : []);
+      }
     } catch (error) {
-      console.error(
-        "🔥 Error fetching dashboard data:",
-        error.response?.data || error.message
-      );
-      showAlert(
-        "Error!",
-        ` ${error.response?.data?.message || error.message}`,
-        "error"
-      );
+      console.error("🔥 Error fetching dashboard data:", error.response?.data || error.message);
+      showAlert("Error!", ` ${error.response?.data?.message || error.message}`, "error");
     }
   };
 
@@ -81,39 +69,19 @@ const Dashboard = () => {
       <Container>
         <Grid container spacing={2} justifyContent="center">
           <Grid item>
-            <CardComponent
-              icon={<FaCalendarCheck />}
-              title="Total Days Off"
-              value={daysOff}
-            />
+            <CardComponent icon={<FaCalendarCheck />} title="Total Days Off" value={daysOff} />
           </Grid>
           <Grid item>
-            <CardComponent
-              icon={<FaBriefcase />}
-              title="Days Off Spent"
-              value={daysOffSpent}
-            />
+            <CardComponent icon={<FaBriefcase />} title="Days Off Spent" value={daysOffSpent} />
           </Grid>
           <Grid item>
-            <CardComponent
-              icon={<FaHospital />}
-              title="Sick Leave Days Taken"
-              value={sickDays}
-            />
+            <CardComponent icon={<FaHospital />} title="Sick Leave Days Taken" value={sickDays} />
           </Grid>
           <Grid item>
-            <CardComponent
-              icon={<FaBirthdayCake />}
-              title="Today's Birthdays"
-              list={birthdaysToday}
-            />
+            <CardComponent icon={<FaBirthdayCake />} title="Today's Birthdays" list={birthdaysToday} />
           </Grid>
           <Grid item>
-            <CardComponent
-              icon={<FaUsers />}
-              title="Department Members at Work"
-              list={departmentMembersAtWork}
-            />
+            <CardComponent icon={<FaUsers />} title="Department Members at Work" list={departmentMembersAtWork} />
           </Grid>
         </Grid>
       </Container>

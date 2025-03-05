@@ -282,6 +282,14 @@ function EditRoleDialog({ roleData, setRoleData, availablePermissions, token, qu
 <Dialog open={true} onClose={onClose} maxWidth="md" fullWidth>
 <DialogTitle>Edit Permissions for {roleData.name}</DialogTitle>
       <DialogContent>
+      <TextField
+      label="Role Name"
+      fullWidth
+      variant="outlined"
+      margin="normal"
+      value={roleData.name}
+      onChange={(e) => setRoleData({ ...roleData, name: e.target.value })}
+    />
         {editedPermissions.map((perm, index) => (
           <div
             key={index}
